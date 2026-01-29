@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>视频播放器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+            min-height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto; /* PC端页面居中 */
+        }
+        .page-header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #333;
+        }
+        .config-group {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .config-item {
+            margin-bottom: 0;
+        }
+        .config-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .config-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fafafa;
+        }
+        .config-input:focus {
+            outline: none;
+            border-color: #2196f3;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(33,150,243,0.1);
+        }
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        .btn {
+            flex: 1;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-start {
+            background: #2196f3;
+            color: #fff;
+        }
+        .btn-start:hover {
+            background: #1976d2;
+        }
+        .btn-toggle {
+            background: #e5e7eb;
+            color: #666;
+        }
+        .btn-toggle:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+            color: #ccc;
+        }
+        /* 核心优化：PC端自适应视频播放器容器 */
+        .video-player {
+            width: 100%;
+            max-width: 1200px; /* PC端最大宽度，避免过宽 */
+            min-width: 320px; /* 最小宽度，适配小窗口 */
+            aspect-ratio: 16/9; /* 固定16:9黄金比例，自动适配高度 */
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto 20px; /* 居中+底部间距 */
+        }
+        #video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover; /* 保持比例，填充容器，无黑边 */
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        /* 预加载动画覆盖层 - 适配自适应容器 */
+        .preload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            transition: opacity 0.5s ease;
+        }
+        .preload-animation {
+            width: 80px;
+            height: 80px;
+            background-image: url('https://qacommunity-70502.njc.vod.tencent-cloud.com/504046ff-7f45-4e44-835f-4ad25a585358.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* 控制栏 - 适配PC端 */
+        .video-controls {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            color: #fff;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .control-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .time-display {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 400;
+        }
+        .control-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .control-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: height 0.2s;
+        }
+        .progress-bar:hover {
+            height: 5px; /* PC端hover进度条变高，提升交互 */
+        }
+        .progress-now {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #2196f3; /* 进度条改为主题色，更醒目 */
+            border-radius: 2px;
+            width: 0;
+        }
+
+        /* 三点菜单下拉 - PC端优化 */
+        .more-menu {
+            position: absolute;
+            bottom: 50px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 140px;
+            display: none;
+            z-index: 11;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .more-menu.active {
+            display: block;
+        }
+        .menu-item {
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .speed-options {
+            padding: 4px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .speed-option {
+            color: #fff;
+            font-size: 13px;
+            padding: 8px 20px;
+            cursor: pointer;
+        }
+        .speed-option.active {
+            color: #2196f3;
+            background: rgba(33,150,243,0.2);
+        }
+        .speed-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* 全屏专属橙色暂停图标 - PC端优化 */
+        .fullscreen-pause-btn {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: #ff9800;
+            font-size: 64px; /* PC端放大图标 */
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 全屏状态下显示橙色暂停按钮 */
+        body:fullscreen .fullscreen-pause-btn,
+        body:-webkit-full-screen .fullscreen-pause-btn,
+        body:-moz-full-screen .fullscreen-pause-btn,
+        body:ms-fullscreen .fullscreen-pause-btn {
+            display: flex;
+        }
+
+        /* 日志面板 - PC端自适应 */
+        .log-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 200px;
+            max-height: 30vh;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            overflow-y: auto;
+            margin: 20px auto;
+            position: relative;
+            max-width: 1200px;
+        }
+        .log-panel::before {
+            content: "📋 播放日志";
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 0 10px 0;
+            font-weight: 600;
+            color: #2196f3;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 10px;
+            background: #fff;
+            z-index: 1;
+            font-size: 14px;
+        }
+        .log-panel .ts-log-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        .copy-ts-btn {
+            background: #2196f3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .copy-ts-btn:hover {
+            background: #1976d2;
+        }
+
+        /* TS列表面板 - PC端自适应 */
+        .ts-list {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 150px;
+            max-height: 35vh;
+            margin: 20px auto;
+            overflow-y: auto;
+            position: relative;
+            max-width: 1200px;
+        }
+        .ts-list::before {
+            content: "TS片段";
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 0 10px 0;
+            font-weight: 600;
+            color: #2196f3;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 10px;
+            background: #fff;
+            z-index: 1;
+            font-size: 14px;
+        }
+        .ts-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .ts-item:last-child {
+            border-bottom: none;
+        }
+        .ts-index {
+            width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: #2196f3;
+            font-size: 14px;
+        }
+        .ts-url {
+            flex: 1;
+            font-size: 13px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0 10px;
+        }
+        .ts-extinf {
+            font-size: 13px;
+            color: #999;
+            min-width: 100px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .copy-tip {
+            color: #4CAF50;
+            font-size: 12px;
+            margin-left: 6px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 响应式适配：小屏PC/平板 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .page-header {
+                font-size: 18px;
+            }
+            .config-group, .btn-group, .video-player, .log-panel, .ts-list {
+                max-width: 100%;
+            }
+            .control-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+            .fullscreen-pause-btn {
+                font-size: 48px;
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">视频播放器</div>
+
+    <div class="config-group">
+        <div class="config-item">
+            <label class="config-label">点播/直播完整地址</label>
+            <input type="text" class="config-input" id="videoUrl" placeholder="m3u8/mp4">
+        </div>
+    </div>
+
+    <div class="video-player">
+        <!-- 预加载动画覆盖层 -->
+        <div class="preload-overlay" id="preloadOverlay">
+            <div class="preload-animation"></div>
+        </div>
+        <video id="video" preload="metadata" disablePictureInPicture playsinline>
+            你的浏览器不支持HTML5视频播放，请升级浏览器
+        </video>
+        <!-- 控制栏 -->
+        <div class="video-controls">
+            <div class="control-top">
+                <div class="time-display" id="timeShow">0:00 / 0:00</div>
+                <div class="control-buttons">
+                    <button class="control-btn volume-btn" id="volumeBtn">🔊</button>
+                    <button class="control-btn fullscreen-btn" id="fullScreenBtn">⛶</button>
+                    <button class="control-btn more-btn" id="moreBtn">⋮</button>
+                </div>
+            </div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-now" id="progressNow"></div>
+            </div>
+        </div>
+        <!-- 三点菜单 -->
+        <div class="more-menu" id="moreMenu">
+            <div class="menu-item download-item">📥 下载</div>
+            <div class="speed-options">
+                <div class="speed-option" data-speed="0.5">0.5x</div>
+                <div class="speed-option active" data-speed="1">1x</div>
+                <div class="speed-option" data-speed="1.5">1.5x</div>
+                <div class="speed-option" data-speed="2">2x</div>
+                <div class="speed-option" data-speed="3">3x</div>
+            </div>
+        </div>
+    </div>
+    <!-- 全屏专属橙色暂停/播放按钮 -->
+    <button class="fullscreen-pause-btn" id="fullscreenPauseBtn">⏸️</button>
+
+    <div class="btn-group">
+        <button class="btn btn-start" id="loadVideo">加载播放</button>
+        <button class="btn btn-toggle" id="togglePlay" disabled>继续/停止播放</button>
+    </div>
+
+    <!-- 日志面板 -->
+    <div class="log-panel" id="logPanel">
+        [初始化] 播放器已就绪，正在准备播放环境...
+    </div>
+
+    <!-- TS片段列表面板 -->
+    <div class="ts-list" id="tsList" style="display: none;">
+        <div id="tsItems"></div>
+    </div>
+
+    <!-- 国内CDN加载HLS.js -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/hls.js/1.4.14/hls.min.js"></script>
+    <script>
+        // DOM元素
+        const videoUrl = document.getElementById('videoUrl');
+        const loadVideo = document.getElementById('loadVideo');
+        const togglePlay = document.getElementById('togglePlay');
+        const video = document.getElementById('video');
+        const progressBar = document.getElementById('progressBar');
+        const progressNow = document.getElementById('progressNow');
+        const timeShow = document.getElementById('timeShow');
+        const fullScreenBtn = document.getElementById('fullScreenBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const moreBtn = document.getElementById('moreBtn');
+        const moreMenu = document.getElementById('moreMenu');
+        const fullscreenPauseBtn = document.getElementById('fullscreenPauseBtn');
+        const player = document.querySelector('.video-player');
+        const logPanel = document.getElementById('logPanel');
+        const tsList = document.getElementById('tsList');
+        const tsItems = document.getElementById('tsItems');
+        const preloadOverlay = document.getElementById('preloadOverlay');
+        // 全局变量
+        let globalTSUrls = [];
+        let globalTSExtinf = [];
+        let currentHls = null;
+        let isLive = false;
+        let originalUrl = '';
+        let hlsLoaded = false;
+        let isMuted = false;
+        let videoDuration = 0; // 存储视频总时长
+        // 日志自动滚动控制
+        let logAutoScroll = true;
+        let logScrollTimer = null;
+
+        // HLS.js加载超时检测
+        let hlsLoadTimer = setTimeout(() => {
+            if (!window.Hls) {
+                hlsLoaded = false;
+                addLog('HLS.js加载超时，自动切换为原生播放模式', 'warn');
+                initPlayer();
+            }
+        }, 5000);
+
+        // 初始化检查HLS.js加载状态
+        window.addEventListener('load', () => {
+            clearTimeout(hlsLoadTimer);
+            hlsLoaded = !!window.Hls;
+            initPlayer();
+        });
+
+        // 初始化播放器
+        function initPlayer() {
+            if (hlsLoaded) {
+                addLog('视频环境已加载完成', 'success');
+            } else {
+                addLog('未加载成功，将使用原生HTML5视频播放', 'info');
+            }
+            addLog('播放器已就绪，支持M3U8/MP4', 'info');
+        }
+
+        // 日志滚动事件
+        logPanel.addEventListener('scroll', () => {
+            logAutoScroll = false;
+            clearTimeout(logScrollTimer);
+            logScrollTimer = setTimeout(() => {
+                logAutoScroll = true;
+                logPanel.scrollTop = logPanel.scrollHeight;
+            }, 30000);
+        });
+
+        // 显示预加载动画
+        function showPreload() {
+            preloadOverlay.style.opacity = '1';
+            preloadOverlay.style.display = 'flex';
+        }
+
+        // 隐藏预加载动画
+        function hidePreload() {
+            preloadOverlay.style.opacity = '0';
+            setTimeout(() => {
+                preloadOverlay.style.display = 'none';
+            }, 500);
+        }
+
+        // 清空日志
+        function clearLog() {
+            logPanel.innerHTML = '播放器已就绪，正在准备播放环境...';
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }
+
+        // 格式化毫秒时间
+        function formatMsTime() {
+            const now = new Date();
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const s = now.getSeconds().toString().padStart(2, '0');
+            const ms = now.getMilliseconds().toString().padStart(3, '0');
+            return `${h}:${m}:${s}.${ms}`;
+        }
+
+        // 优化时长格式化，兼容NaN和Infinity
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds === Infinity || seconds <= 0) return '0:00';
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        // 格式化EXTINF时长为#EXTINF:X.000标准格式
+        function formatExtinf(time) {
+            if (isNaN(time) || time <= 0) return '#EXTINF:0.000';
+            return `#EXTINF:${parseFloat(time).toFixed(3)}`;
+        }
+
+        // 复制TS链接
+        function copyTSLink(url, btn) {
+            const oldTip = btn.parentNode.querySelector('.copy-tip');
+            if (oldTip) oldTip.remove();
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showCopyTip(btn, '复制成功');
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(url, btn, err);
+                });
+            } else {
+                fallbackCopyTextToClipboard(url, btn);
+            }
+        }
+
+        // 复制降级方案
+        function fallbackCopyTextToClipboard(url, btn, err) {
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                textArea.style.position = 'absolute';
+                textArea.style.left = '-9999px';
+                textArea.style.top = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyTip(btn, '复制成功');
+                if (err) addLog(`剪贴板API失效，已使用降级方案：${err.message}`, 'warn');
+            } catch (fallbackErr) {
+                showCopyTip(btn, '复制失败', 'color: #F44336;');
+                addLog(`复制TS链接失败：${fallbackErr.message}`, 'error');
+            }
+        }
+
+        // 显示复制提示
+        function showCopyTip(btn, text, style = 'color: #4CAF50;') {
+            const tip = document.createElement('span');
+            tip.className = 'copy-tip';
+            tip.innerText = text;
+            tip.style = style;
+            btn.parentNode.appendChild(tip);
+            setTimeout(() => {
+                tip.remove();
+            }, 2000);
+        }
+
+        // 添加日志
+        function addLog(text, type = 'info', isTS = false, tsUrl = '', tsIndex = 0) {
+            const time = formatMsTime();
+            let logClass = '';
+            if (type === 'success') logClass = 'color: #4CAF50;';
+            if (type === 'error') logClass = 'color: #F44336;';
+            if (type === 'warn') logClass = 'color: #FF9800;';
+
+            if (isTS && tsUrl) {
+                const logItem = document.createElement('div');
+                logItem.className = 'ts-log-item';
+                const escapeUrl = tsUrl.replace(/'/g, '\\\'').replace(/"/g, '\\"');
+                logItem.innerHTML = `
+                    <span>[${time}]</span>
+                    <span style="${logClass}">${text}</span>
+                    <button class="copy-ts-btn" onclick="copyTSLink('${escapeUrl}', this)">复制TS链接</button>
+                `;
+                logPanel.appendChild(logItem);
+            } else {
+                logPanel.innerHTML += `<br>[${time}] <span style="${logClass}">${text}</span>`;
+            }
+            if (logAutoScroll) {
+                logPanel.scrollTop = logPanel.scrollHeight;
+            }
+        }
+
+        // 优化M3U8直播/点播检测逻辑
+        function detectM3U8Type(m3u8Content) {
+            const isVodByTag = /#EXT-X-PLAYLIST-TYPE:VOD/i.test(m3u8Content);
+            const hasEndList = /#EXT-X-ENDLIST/i.test(m3u8Content);
+            const hasMultipleExtinf = (m3u8Content.match(/#EXTINF:/gi) || []).length >= 2;
+            const isVod = isVodByTag || hasEndList || hasMultipleExtinf;
+            const isLiveByTag = /#EXT-X-LIVE|#EXT-X-STREAM-INF/i.test(m3u8Content);
+            const isLiveByNoEnd = !hasEndList && !isVodByTag && !hasMultipleExtinf;
+            return !isVod || (isLiveByTag && !hasMultipleExtinf);
+        }
+
+        // 获取M3U8基础URL
+        function getM3U8BaseUrl(fullUrl) {
+            const lastSlashIndex = fullUrl.lastIndexOf('/');
+            if (lastSlashIndex === -1) return '';
+            return fullUrl.substring(0, lastSlashIndex + 1);
+        }
+
+        // M3U8解析
+        async function parseM3U8() {
+            addLog(`开始解析M3U8文件：${originalUrl}`, 'info');
+            try {
+                const response = await fetch(originalUrl, {
+                    mode: 'cors',
+                    credentials: 'omit',
+                    timeout: 15000
+                });
+                if (!response.ok) throw new Error(`请求失败，状态码：${response.status}`);
+                const m3u8Content = await response.text();
+                isLive = detectM3U8Type(m3u8Content);
+                addLog(`M3U8解析完成，${isLive ? '检测为【直播流】（TS实时刷新）' : '检测为【点播流】'}`, 'success');
+                
+                // 从M3U8解析总时长
+                if (!isLive) {
+                    const extinfMatches = m3u8Content.match(/#EXTINF:(\d+\.?\d*)/g);
+                    if (extinfMatches) {
+                        videoDuration = extinfMatches.reduce((total, match) => {
+                            return total + parseFloat(match.replace('#EXTINF:', ''));
+                        }, 0);
+                        timeShow.innerText = `0:00 / ${formatTime(videoDuration)}`;
+                        addLog(`解析M3U8总时长：${formatTime(videoDuration)}`, 'info');
+                    }
+                }
+                
+                const lines = m3u8Content.split('\n').map(line => line.trim()).filter(line => line);
+                const tsUrls = [];
+                const tsExtinfList = [];
+                const baseUrl = getM3U8BaseUrl(originalUrl);
+                let currentExtinf = 0;
+                const extinfReg = /#EXTINF:(\d+\.?\d*)/i;
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const extinfMatch = line.match(extinfReg);
+                    if (extinfMatch) {
+                        currentExtinf = parseFloat(extinfMatch[1]);
+                        if (i + 1 < lines.length && !lines[i + 1].startsWith('#')) {
+                            let tsUrl = lines[i + 1];
+                            if (!tsUrl.startsWith('http') && baseUrl) {
+                                tsUrl = baseUrl + tsUrl;
+                            }
+                            if (!tsUrls.includes(tsUrl)) {
+                                tsUrls.push(tsUrl);
+                                tsExtinfList.push(currentExtinf || 0);
+                            }
+                            i++;
+                        }
+                        continue;
+                    }
+                    if (!line.startsWith('#') && (line.includes('.ts') || line.includes('.m3u8'))) {
+                        let tsUrl = line;
+                        if (!tsUrl.startsWith('http') && baseUrl) {
+                            tsUrl = baseUrl + tsUrl;
+                        }
+                        if (!tsUrls.includes(tsUrl)) {
+                            tsUrls.push(tsUrl);
+                            tsExtinfList.push(currentExtinf || 0);
+                        }
+                        currentExtinf = 0;
+                    }
+                }
+
+                const uniqueTsMap = new Map();
+                tsUrls.forEach((url, idx) => uniqueTsMap.set(url, tsExtinfList[idx]));
+                const uniqueTsUrls = Array.from(uniqueTsMap.keys());
+                const uniqueExtinf = Array.from(uniqueTsMap.values());
+                
+                if (isLive) {
+                    uniqueTsUrls.forEach((url, idx) => {
+                        if (!globalTSUrls.includes(url)) {
+                            globalTSUrls.push(url);
+                            globalTSExtinf.push(uniqueExtinf[idx]);
+                        }
+                    });
+                } else {
+                    globalTSUrls = uniqueTsUrls;
+                    globalTSExtinf = uniqueExtinf;
+                }
+
+                if (uniqueTsUrls.length > 0) {
+                    renderTSList(globalTSUrls, globalTSExtinf);
+                    if (isLive) {
+                        uniqueTsUrls.forEach((tsUrl, idx) => {
+                            const tsSeq = globalTSUrls.findIndex(u => u === tsUrl) + 1;
+                            const extinfTime = uniqueExtinf[idx];
+                            const extinfText = formatExtinf(extinfTime);
+                            addLog(`【TS-${tsSeq}】${extinfText}，直播实时分片：${tsUrl}`, 'info', true, tsUrl, tsSeq);
+                        });
+                    } else {
+                        uniqueTsUrls.forEach((tsUrl, idx) => {
+                            const tsSeq = idx + 1;
+                            const extinfTime = uniqueExtinf[idx];
+                            const extinfText = formatExtinf(extinfTime);
+                            addLog(`【TS-${tsSeq}】${extinfText}，链接：${tsUrl}`, 'info', true, tsUrl, tsSeq);
+                        });
+                    }
+                } else {
+                    addLog(`${isLive ? '【直播流】' : '【点播流】'}未提取到TS分片`, 'warn');
+                }
+                return uniqueTsUrls;
+            } catch (error) {
+                addLog(`M3U8解析失败：${error.message}`, 'error');
+                isLive = false;
+                globalTSUrls = [];
+                globalTSExtinf = [];
+                hidePreload();
+                return [];
+            }
+        }
+
+        // 渲染TS列表
+        function renderTSList(tsUrls, tsExtinf) {
+            tsList.style.display = 'block';
+            if (!isLive) {
+                tsItems.innerHTML = '';
+            }
+            const startIndex = isLive ? tsItems.children.length : 0;
+            for (let i = startIndex; i < tsUrls.length; i++) {
+                const url = tsUrls[i];
+                const extinfTime = tsExtinf[i] || 0;
+                const extinfText = formatExtinf(extinfTime);
+                const item = document.createElement('div');
+                item.className = 'ts-item';
+                const escapeUrl = url.replace(/'/g, '\\\'').replace(/"/g, '\\"');
+                item.innerHTML = `
+                    <span class="ts-index">${i + 1}</span>
+                    <span class="ts-url" title="${extinfText}">${url}</span>
+                    <span class="ts-extinf">${extinfText}</span>
+                    <button class="copy-ts-btn" onclick="copyTSLink('${escapeUrl}', this)">复制链接</button>
+                `;
+                tsItems.appendChild(item);
+            }
+        }
+
+        // 销毁HLS实例
+        function destroyHls() {
+            if (currentHls) {
+                currentHls.destroy();
+                currentHls = null;
+            }
+        }
+
+        // 加载播放核心逻辑
+        loadVideo.addEventListener('click', async () => {
+            originalUrl = videoUrl.value.trim();
+            if (!originalUrl) {
+                addLog('错误：请输入有效的视频/直播地址', 'error');
+                return;
+            }
+            showPreload();
+            clearLog();
+            destroyHls();
+            video.pause();
+            progressNow.style.width = '0%';
+            timeShow.innerText = '0:00 / 0:00';
+            videoDuration = 0; // 重置时长
+            if (!isLive) {
+                tsList.style.display = 'none';
+                tsItems.innerHTML = '';
+            }
+            globalTSUrls = [];
+            globalTSExtinf = [];
+            isLive = false;
+            togglePlay.disabled = true;
+            logAutoScroll = true;
+            clearTimeout(logScrollTimer);
+
+            video.style.display = 'block';
+
+            addLog(`请求加载：${originalUrl}`, 'info');
+
+            const isM3U8 = originalUrl.toLowerCase().endsWith('.m3u8') || originalUrl.toLowerCase().includes('.m3u8?');
+            let primaryPlaySuccess = false;
+
+            if (isM3U8) {
+                addLog('检测到M3U8格式，尝试解析播放', 'info');
+                const tsUrls = await parseM3U8();
+                if (tsUrls.length === 0 && !isLive) {
+                    addLog('M3U8解析返回空分片列表，尝试原生播放', 'warn');
+                    playWithNative();
+                    hidePreload();
+                    return;
+                }
+
+                if (hlsLoaded && window.Hls.isSupported()) {
+                    try {
+                        currentHls = new Hls({
+                            liveSyncDuration: 3,
+                            liveMaxLatencyDuration: 15,
+                            enableWorker: true,
+                            maxBufferLength: isLive ? 10 : 30,
+                            manifestLoadingRetryDelay: 2000,
+                            fragmentLoadingRetryDelay: 2000,
+                            maxBufferLength: 30,
+                            maxMaxBufferLength: 600,
+                            manifestLoadingMaxRetry: 2,
+                            fragmentLoadingMaxRetry: 2,
+                            lowLatencyMode: isLive
+                        });
+
+                        currentHls.detachMedia(video);
+                        currentHls.loadSource(originalUrl);
+                        currentHls.attachMedia(video);
+                        
+                        // HLS.js多事件监听时长
+                        currentHls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+                            if (data.details && data.details.totalDuration) {
+                                videoDuration = data.details.totalDuration;
+                                timeShow.innerText = `0:00 / ${formatTime(videoDuration)}`;
+                                addLog(`HLS获取总时长：${formatTime(videoDuration)}`, 'info');
+                            }
+                        });
+
+                        currentHls.on(Hls.Events.MANIFEST_PARSED, () => {
+                            primaryPlaySuccess = true;
+                            togglePlay.disabled = false;
+                            video.play().then(() => {
+                                addLog(`${isLive ? '直播流' : '点播流'}播放成功`, 'success');
+                                hidePreload();
+                            }).catch(err => {
+                                addLog(`自动播放被拦截，请手动点击播放按钮`, 'warn');
+                                hidePreload();
+                                togglePlay.disabled = false;
+                            });
+                            if (isLive) {
+                                progressBar.style.pointerEvents = 'auto';
+                                addLog('【直播流】已启用进度条，TS分片实时刷新中', 'info');
+                                setInterval(async () => {
+                                    if (isLive && !video.paused) {
+                                        await parseM3U8();
+                                    }
+                                }, 5000);
+                            } else {
+                                progressBar.style.pointerEvents = 'auto';
+                            }
+                        });
+
+                        currentHls.on(Hls.Events.ERROR, (event, data) => {
+                            addLog(`HLS播放失败：${data.details}，自动切换为原生播放`, 'error');
+                            destroyHls();
+                            playWithNative();
+                        });
+
+                        currentHls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+                            if (!data.frag || !data.frag.url) return;
+                            const tsIndex = globalTSUrls.findIndex(u => u === data.frag.url) + 1 || globalTSUrls.length + 1;
+                            if (!globalTSUrls.includes(data.frag.url)) {
+                                globalTSUrls.push(data.frag.url);
+                                globalTSExtinf.push(parseFloat(data.frag.duration) || 0);
+                                renderTSList(globalTSUrls, globalTSExtinf);
+                            }
+                            const extinfTime = globalTSExtinf[tsIndex - 1] || parseFloat(data.frag.duration) || 0;
+                            const extinfText = formatExtinf(extinfTime);
+                            addLog(`【TS-${tsIndex}】${extinfText}，${isLive ? '直播实时加载' : '加载完成'}：${data.frag.url}`, 'success', true, data.frag.url, tsIndex);
+                        });
+                    } catch (hlsError) {
+                        addLog(`HLS初始化失败：${hlsError.message}，切换为原生播放`, 'error');
+                        destroyHls();
+                        playWithNative();
+                    }
+                } else {
+                    playWithNative();
+                }
+            } else {
+                addLog('检测为普通视频格式，开始加载', 'info');
+                video.src = originalUrl;
+                video.onloadedmetadata = function() {
+                    videoDuration = video.duration;
+                    addLog(`普通视频元数据加载完成，时长：${formatTime(videoDuration)}`, 'success');
+                    timeShow.innerText = `0:00 / ${formatTime(videoDuration)}`;
+                };
+                video.load();
+                video.play().then(() => {
+                    primaryPlaySuccess = true;
+                    togglePlay.disabled = false;
+                    addLog('普通视频播放成功', 'success');
+                    hidePreload();
+                }).catch(err => {
+                    addLog('普通视频播放失败：' + err.message, 'error');
+                    hidePreload();
+                });
+            }
+
+            // 强制实时更新时间与进度
+            video.addEventListener('timeupdate', () => {
+                const currentTime = video.currentTime;
+                if (videoDuration > 0) {
+                    timeShow.innerText = `${formatTime(currentTime)} / ${formatTime(videoDuration)}`;
+                    const progressRate = (currentTime / videoDuration) * 100;
+                    progressNow.style.width = `${progressRate}%`;
+                } else if (video.duration > 0) {
+                    // 降级方案：直接从video元素获取时长
+                    videoDuration = video.duration;
+                    timeShow.innerText = `${formatTime(currentTime)} / ${formatTime(videoDuration)}`;
+                    const progressRate = (currentTime / videoDuration) * 100;
+                    progressNow.style.width = `${progressRate}%`;
+                }
+            });
+        });
+
+        // 原生播放M3U8
+        function playWithNative() {
+            addLog('使用原生HTML5视频播放', 'info');
+            video.src = originalUrl;
+            video.load();
+            video.play().then(() => {
+                togglePlay.disabled = false;
+                addLog('原生播放成功', 'success');
+                hidePreload();
+            }).catch(err => {
+                addLog('原生播放失败：' + err.message, 'error');
+                hidePreload();
+            });
+        }
+
+        // 播放/暂停切换
+        togglePlay.addEventListener('click', () => {
+            if (video.paused) {
+                video.play().then(() => {
+                    fullscreenPauseBtn.innerText = '⏸️';
+                    addLog(`${isLive ? '直播流' : '视频'}继续播放`, 'success');
+                }).catch(err => {
+                    addLog(`播放失败：${err.message}，请检查浏览器权限`, 'error');
+                });
+            } else {
+                video.pause();
+                fullscreenPauseBtn.innerText = '▶️';
+                addLog(`${isLive ? '直播流' : '视频'}已暂停`, 'info');
+            }
+        });
+
+        // 音量切换
+        volumeBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            video.muted = isMuted;
+            volumeBtn.innerText = isMuted ? '🔇' : '🔊';
+            addLog(`已${isMuted ? '静音' : '取消静音'}`, 'info');
+        });
+
+        // 全屏切换
+        fullScreenBtn.addEventListener('click', () => {
+            if (!video.src) return;
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+                fullScreenBtn.innerText = '⛶';
+                addLog('用户退出全屏', 'info');
+            } else {
+                player.requestFullscreen().catch(err => {
+                    addLog(`全屏失败：${err.message}`, 'error');
+                });
+                fullScreenBtn.innerText = '❌';
+                addLog('用户进入全屏', 'info');
+            }
+        });
+
+        // 更多按钮
+        moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            moreMenu.classList.toggle('active');
+        });
+
+        // 点击空白处关闭更多菜单
+        document.addEventListener('click', () => {
+            moreMenu.classList.remove('active');
+        });
+
+        // 倍速选择
+        document.querySelectorAll('.speed-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const speed = parseFloat(option.dataset.speed);
+                video.playbackRate = speed;
+                document.querySelectorAll('.speed-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                addLog(`已切换倍速为${speed}x`, 'info');
+                moreMenu.classList.remove('active');
+            });
+        });
+
+        // 下载功能
+        document.querySelector('.download-item').addEventListener('click', () => {
+            addLog('触发视频下载功能', 'info');
+            // 可在此处添加下载逻辑
+            moreMenu.classList.remove('active');
+        });
+
+        // 全屏专属橙色播放/暂停按钮点击
+        fullscreenPauseBtn.addEventListener('click', () => {
+            if (!video.src) return;
+            if (video.paused) {
+                video.play().then(() => {
+                    fullscreenPauseBtn.innerText = '⏸️';
+                    addLog(`${isLive ? '直播流' : '视频'}继续播放`, 'success');
+                }).catch(err => {
+                    addLog(`播放失败：${err.message}，请检查浏览器权限`, 'error');
+                });
+            } else {
+                video.pause();
+                fullscreenPauseBtn.innerText = '▶️';
+                addLog(`${isLive ? '直播流' : '视频'}已暂停`, 'info');
+            }
+        });
+
+        // 进度条跳转
+        progressBar.addEventListener('click', (e) => {
+            if (isLive || !videoDuration) return;
+            const barX = e.offsetX / progressBar.offsetWidth;
+            video.currentTime = barX * videoDuration;
+            addLog(`用户跳转进度到：${formatTime(video.currentTime)}`, 'info');
+        });
+
+        // 全屏状态监听
+        document.addEventListener('fullscreenchange', () => {
+            fullScreenBtn.innerText = document.fullscreenElement ? '❌' : '⛶';
+            if (document.fullscreenElement) {
+                fullscreenPauseBtn.innerText = video.paused ? '▶️' : '⏸️';
+            }
+        });
+
+        // 视频加载错误事件
+        video.addEventListener('error', () => {
+            addLog(`播放失败：错误码${video.error.code}，错误信息：${video.error.message || '未知错误'}`, 'error');
+            hidePreload();
+        });
+
+        // 视频播放结束
+        video.addEventListener('ended', () => {
+            if (!isLive) {
+                progressNow.style.width = '0%';
+                video.currentTime = 0;
+                timeShow.innerText = `0:00 / ${formatTime(videoDuration)}`;
+                addLog('点播视频播放结束，已重置播放位置', 'info');
+            }
+        });
+
+        // 回车触发加载
+        videoUrl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadVideo.click();
+        });
+    </script>
+</body>
+</html>
