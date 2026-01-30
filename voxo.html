@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸运星</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 25px; }
+        h2 { text-align: center; color: #333; font-size: 20px; margin-bottom: 25px; }
+        
+        /* 输入区域 */
+        .input-area { margin-bottom: 20px; }
+        .input-area label { display: block; color: #666; font-size: 16px; margin-bottom: 8px; }
+        .input-area input { width: 100%; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 15px; outline: none; }
+        .input-area input:focus { border-color: #1677ff; }
+        
+        /* 按钮组 */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 12px 0; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .btn-primary { flex: 2; background: #1677ff; color: #fff; }
+        .btn-default { flex: 1; background: #f9fafb; color: #333; }
+        
+        /* 响应内容区域 */
+        .response-area { margin-top: 15px; }
+        .response-area label { display: block; color: #666; font-size: 16px; margin-bottom: 8px; }
+        .response-box { width: 100%; min-height: 150px; padding: 15px; border: 2px solid #52c41a; border-radius: 8px; background: #f6ffed; color: #006644; font-size: 15px; line-height: 1.8; }
+        
+        /* 弹窗遮罩 */
+        .modal-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; align-items: center; justify-content: center; }
+        /* 弹窗容器 */
+        .modal-container { width: 85%; max-width: 350px; background: #fff; border-radius: 12px; padding: 25px 15px; text-align: center; }
+        .modal-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 20px; }
+        .modal-pw-label { font-size: 16px; color: #333; margin-bottom: 10px; }
+        .modal-password { font-size: 17px; color: #1677ff; padding: 12px; background: #f5f7fa; border-radius: 8px; margin-bottom: 20px; letter-spacing: 1px; }
+        /* 弹窗按钮 */
+        .jump-btn { width: 100%; padding: 14px 0; margin-bottom: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; color: #fff; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); cursor: pointer; }
+        .withdraw-btn { width: 100%; padding: 12px 0; margin-bottom: 20px; border: 2px solid #ff4d4f; border-radius: 8px; font-size: 16px; font-weight: 500; color: #ff4d4f; background: transparent; cursor: pointer; }
+        .modal-btn-group { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: none; font-size: 15px; cursor: pointer; }
+        .modal-copy { background: #f9fafb; color: #333; }
+        .modal-close { background: #1677ff; color: #fff; }
+        .copy-tip { color: #52c41a; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>星卡</h2>
+        
+        <!-- 输入区域 -->
+        <div class="input-area">
+            <label>口令</label>
+            <input type="text" id="code" placeholder="请输入复制的星卡口令">
+        </div>
+        
+        <!-- 按钮组 -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="sendRequest()">发起请求</button>
+            <button class="btn btn-default" onclick="clearAll()">清空内容</button>
+        </div>
+        
+        <!-- 响应内容区域 -->
+        <div class="response-area">
+            <label>响应内容</label>
+            <div class="response-box" id="responseBox">等待请求发起..</div>
+        </div>
+    </div>
+
+    <!-- 弹窗 -->
+    <div class="modal-mask" id="modalMask">
+        <div class="modal-container">
+            <h3 class="modal-title">红包口令已生成</h3>
+            <div class="modal-pw-label">红包口令:</div>
+            <div class="modal-password" id="modalPassword">——</div>
+            
+            <button class="jump-btn" onclick="jumpToWallet()">跳转领取红包</button>
+            <button class="withdraw-btn" id="withdrawBtn" onclick="manualWithdraw()">撤回红包（60秒）</button>
+            
+            <div class="modal-btn-group">
+                <button class="modal-btn modal-copy" onclick="copyPassword()">复制口令</button>
+                <button class="modal-btn modal-close" onclick="closeModal()">关闭</button>
+            </div>
+            <div class="copy-tip" id="copyTip">口令复制成功！</div>
+        </div>
+    </div>
+
+    <script>
+        // 基础配置
+        const BACKEND_API = 'http://a51d7f26.wksite.cn/xxx.php';
+        const REDPACKET_API = 'http://a51d7f26.wksite.cn/vvv.php';
+        const WALLET_URL = 'https://openapi.52vmy.cn/user/wallet?pw=';
+        const WITHDRAW_URL = 'https://openapi.52vmy.cn/post/user/ajax';
+        const FIXED_GROUP = '923764525';
+        const FIXED_USER = '3217174732';
+        const COUNTDOWN_SECONDS = 60;
+        let isRequesting = false;
+        let currentPassword = '';
+        let countdownTimer = null;
+        let remainingSeconds = COUNTDOWN_SECONDS;
+        
+        // 元素获取
+        const codeInput = document.getElementById('code');
+        const responseBox = document.getElementById('responseBox');
+        const modalMask = document.getElementById('modalMask');
+        const modalPassword = document.getElementById('modalPassword');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const copyTip = document.getElementById('copyTip');
+        const codeReg = /^[0-9a-zA-Z]{32}$/;
+
+
+        // 网站加载时检查口令撤回状态
+        window.onload = function() {
+            const lastPassword = localStorage.getItem('lastRedPacketPw');
+            if (lastPassword) {
+                currentPassword = lastPassword;
+                checkWithdrawStatus(currentPassword);
+            }
+        }
+
+        // 检查口令撤回状态
+        async function checkWithdrawStatus(password) {
+            try {
+                const params = new URLSearchParams({
+                    act: 'check_withdraw',
+                    user: FIXED_USER,
+                    password: password
+                });
+                const checkUrl = `${WITHDRAW_URL}?${params.toString()}`;
+
+                const res = await fetch(REDPACKET_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ withdrawUrl: checkUrl })
+                });
+                const result = await res.json();
+                const resJson = JSON.parse(result.data || '{}');
+
+                if (resJson.code === 200) {
+                    responseBox.innerText = `提示：口令【${password}】已撤回`;
+                }
+            } catch (error) {}
+        }
+
+
+        // 清空功能
+        function clearAll() {
+            codeInput.value = '';
+            responseBox.innerText = '等待请求发起..';
+            isRequesting = false;
+            currentPassword = '';
+            localStorage.removeItem('lastRedPacketPw');
+            clearCountdown();
+            closeModal();
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            modalMask.style.display = 'none';
+            copyTip.style.display = 'none';
+            clearCountdown();
+        }
+
+        // 复制口令
+        function copyPassword() {
+            if (!currentPassword) return;
+            navigator.clipboard.writeTextText(currentPassword).then(() => {
+                copyTip.style.display = 'block';
+                setTimeout(() => copyTip.style.display = 'none', 2000);
+            }).catch(() => {
+                alert('复制失败，请手动复制！');
+            });
+        }
+
+        // 跳转领取红包
+        function jumpToWallet() {
+            if (!currentPassword) return;
+            const fullUrl = WALLET_URL + currentPassword;
+            window.open(fullUrl, '_blank');
+        }
+
+        // 格式化倒计时
+        function formatCountdown(seconds) {
+            return `${seconds}秒`;
+        }
+
+        // 启动倒计时
+        function startCountdown() {
+            clearCountdown();
+            remainingSeconds = COUNTDOWN_SECONDS;
+            withdrawBtn.innerText = `撤回红包（${formatCountdown(remainingSeconds)}）`;
+
+            countdownTimer = setInterval(() => {
+                remainingSeconds--;
+                withdrawBtn.innerText = `撤回红包（${formatCountdown(remainingSeconds)}）`;
+
+                if (remainingSeconds <= 0) {
+                    clearCountdown();
+                    autoWithdraw();
+                }
+            }, 1000);
+        }
+
+        // 清除倒计时
+        function clearCountdown() {
+            if (countdownTimer) clearInterval(countdownTimer);
+            withdrawBtn.innerText = `撤回红包（${formatCountdown(COUNTDOWN_SECONDS)}）`;
+        }
+
+        // 自动撤回
+        async function autoWithdraw() {
+            if (!currentPassword) return;
+            await executeWithdraw();
+        }
+
+        // 手动撤回
+        async function manualWithdraw() {
+            if (!currentPassword) return;
+            clearCountdown();
+            withdrawBtn.innerText = '撤回中...';
+            withdrawBtn.disabled = true;
+            await executeWithdraw();
+        }
+
+        // 执行撤回
+        async function executeWithdraw() {
+            try {
+                const params = new URLSearchParams({
+                    act: 'withdraw_redpacket',
+                    user: FIXED_USER,
+                    password: currentPassword
+                });
+                const fullWithdrawUrl = `${WITHDRAW_URL}?${params.toString()}`;
+
+                const res = await fetch(REDPACKET_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ withdrawUrl: fullWithdrawUrl })
+                });
+                const result = await res.json();
+                const resJson = JSON.parse(result.data || '{}');
+                
+                if (resJson.code === 200) {
+                    withdrawBtn.innerText = '已撤回';
+                    responseBox.innerText = `提示：口令【${currentPassword}】已撤回`;
+                    localStorage.setItem('lastRedPacketPw', currentPassword);
+                } else {
+                    withdrawBtn.innerText = '撤回失败';
+                }
+                withdrawBtn.disabled = true;
+            } catch (error) {
+                withdrawBtn.innerText = '撤回异常';
+                withdrawBtn.disabled = true;
+            }
+        }
+
+        // 生成口令+启动倒计时
+        async function generatePasswordAndRequest() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000).toString();
+            currentPassword = FIXED_GROUP + randomNum;
+            modalPassword.innerText = currentPassword;
+            localStorage.setItem('lastRedPacketPw', currentPassword);
+            startCountdown();
+
+            try {
+                await fetch(REDPACKET_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: currentPassword })
+                });
+            } catch (e) {}
+        }
+
+        // 核心请求逻辑
+        async function sendRequest() {
+            if (isRequesting) return;
+            isRequesting = true;
+            const code = codeInput.value.trim();
+
+            if (!code || !codeReg.test(code)) {
+                alert('请输入正确的口令');
+                codeInput.focus();
+                isRequesting = false;
+                return;
+            }
+
+            responseBox.innerText = '请求中...';
+
+            try {
+                const response = await fetch(BACKEND_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    const resJson = JSON.parse(result.responseText);
+                    if (resJson.code === 200) {
+                        responseBox.innerText = resJson.name || '操作成功';
+                        modalMask.style.display = 'flex';
+                        await generatePasswordAndRequest();
+                    } else if (resJson.code === 201) {
+                        responseBox.innerText = resJson.data || '操作提示';
+                    } else {
+                        responseBox.innerText = `未知状态：${resJson.data || resJson.name}`;
+                    }
+                } else {
+                    responseBox.innerText = `请求失败：${result.msg}`;
+                }
+            } catch (error) {
+                responseBox.innerText = `请求异常：${error.message}`;
+            } finally {
+                isRequesting = false;
+            }
+        }
+    </script>
+</body>
+</html>
