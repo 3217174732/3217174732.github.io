@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<title>PNG 伪装 TS · HLS 播放器</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #07090e;
+    color: #e9edf5;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Microsoft YaHei",
+        sans-serif;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.container {
+    width: min(920px, calc(100% - 24px));
+    margin: 20px auto 60px;
+}
+
+.header {
+    padding: 22px;
+    border-radius: 22px;
+    background: linear-gradient(
+        145deg,
+        #141a27,
+        #0e121b
+    );
+    border: 1px solid #252c3a;
+    box-shadow: 0 15px 45px rgba(0,0,0,.35);
+    margin-bottom: 18px;
+}
+
+.header h1 {
+    margin: 0 0 8px;
+    font-size: 25px;
+}
+
+.header p {
+    margin: 0;
+    color: #929bad;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.card {
+    background: #111620;
+    border: 1px solid #252c3a;
+    border-radius: 22px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #aeb7c8;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 13px;
+    border: 1px solid #303848;
+    outline: none;
+    background: #090c12;
+    color: #fff;
+    font-size: 14px;
+}
+
+input:focus {
+    border-color: #6b8cff;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: 0;
+    border-radius: 13px;
+    padding: 13px 20px;
+    background: #2a3243;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button.primary {
+    background: #596fff;
+}
+
+button.danger {
+    background: #8f3343;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.video-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+}
+
+.aliyun-player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+    display: none;
+    z-index: 30;
+}
+
+.loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+    opacity: 0;
+    transition: .25s;
+    z-index: 20;
+}
+
+.loading.show {
+    opacity: 1;
+}
+
+.spinner {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,.18);
+    border-top-color: #fff;
+    animation: spin .8s linear infinite;
+    margin-bottom: 14px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    font-size: 16px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.stat {
+    background: #090c12;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.stat-title {
+    color: #818a9c;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.progress {
+    height: 8px;
+    background: #292f3c;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #6578ff;
+    transition: width .2s;
+}
+
+.status {
+    margin-top: 12px;
+    display: inline-block;
+    padding: 8px 13px;
+    border-radius: 99px;
+    background: #20283a;
+    color: #b9c3d7;
+    font-size: 13px;
+}
+
+.log-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.log-title h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.badge {
+    padding: 7px 12px;
+    border-radius: 99px;
+    background: #222a3b;
+    color: #b8c2d6;
+    font-size: 13px;
+}
+
+.log {
+    height: 400px;
+    overflow-y: auto;
+    padding: 17px;
+    background: #05070b;
+    border-radius: 16px;
+    font-family:
+        "Consolas",
+        "Courier New",
+        monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.log-line {
+    margin-bottom: 3px;
+}
+
+.log-info {
+    color: #91d9ff;
+}
+
+.log-ok {
+    color: #79e3a3;
+}
+
+.log-warn {
+    color: #ffd479;
+}
+
+.log-error {
+    color: #ff7886;
+}
+
+.log-url {
+    color: #c6b8ff;
+}
+
+.log-dim {
+    color: #788397;
+}
+
+.clear {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.notice {
+    margin-top: 13px;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: #171d2a;
+    color: #aeb8c9;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+@media(max-width:650px) {
+
+    .container {
+        width: calc(100% - 16px);
+        margin-top: 10px;
+    }
+
+    .card {
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .header {
+        padding: 17px;
+        border-radius: 18px;
+    }
+
+    .header h1 {
+        font-size: 21px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .log {
+        height: 420px;
+        font-size: 12px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+    <h1>PNG 伪装 TS · HLS 播放器</h1>
+
+    <p>
+        原生 H5 → hls.js → 阿里云原生 H5 诊断播放器
+    </p>
+
+</div>
+
+<div class="card">
+
+    <label>M3U8 地址</label>
+
+    <input
+        id="m3u8Input"
+        type="text"
+        placeholder="请输入 M3U8 地址"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+    >
+
+    <div class="buttons">
+
+        <button
+            id="startBtn"
+            class="primary"
+            onclick="startPlayer()">
+            ▶ 开始播放
+        </button>
+
+        <button
+            onclick="stopPlayer()">
+            ■ 停止
+        </button>
+
+        <button
+            onclick="openAliyunPlayer()">
+            阿里云 H5
+        </button>
+
+    </div>
+
+    <div class="notice">
+
+        当前模式：
+
+        <b>原生 H5 → hls.js → 阿里云</b>
+
+        <br>
+
+        hls.js 中：
+
+        <b>Manifest 使用默认 Loader</b>，
+
+        <b>TS/媒体分片使用 Custom Fragment Loader</b>。
+
+        <br>
+
+        这样可以避免 Custom Loader 错误处理虚拟 M3U8。
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="video-box">
+
+        <video
+            id="video"
+            controls
+            playsinline
+            preload="metadata">
+        </video>
+
+        <iframe
+            id="aliyunPlayer"
+            class="aliyun-player"
+            allow="autoplay; fullscreen"
+            allowfullscreen>
+        </iframe>
+
+        <div
+            id="loading"
+            class="loading">
+
+            <div class="spinner"></div>
+
+            <div
+                id="loadingText"
+                class="loading-text">
+                正在加载...
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="stat-title">
+                M3U8 分片
+            </div>
+
+            <div
+                id="total"
+                class="stat-value">
+                0
+            </div>
+
+        </div>
+
+        <div class="stat">
+
+            <div class="stat-title">
+                成功读取
+            </div>
+
+            <div
+                id="success"
+                class="stat-value">
+                0
+            </div>
+
+        </div>
+
+        <div class="stat">
+
+            <div class="stat-title">
+                失败
+            </div>
+
+            <div
+                id="failed"
+                class="stat-value">
+                0
+            </div>
+
+        </div>
+
+        <div class="stat">
+
+            <div class="stat-title">
+                当前分片
+            </div>
+
+            <div
+                id="current"
+                class="stat-value">
+                -
+            </div>
+
+        </div>
+
+    </div>
+
+    <div
+        id="status"
+        class="status">
+        等待播放
+    </div>
+
+    <div class="progress">
+
+        <div
+            id="progressBar"
+            class="progress-bar">
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="log-title">
+
+        <h2>运行日志</h2>
+
+        <div class="badge">
+            H5 → hls.js → Aliyun
+        </div>
+
+    </div>
+
+    <div
+        id="log"
+        class="log">
+    </div>
+
+    <button
+        class="clear"
+        onclick="clearLog()">
+        清空日志
+    </button>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   全局变量
+========================================================= */
+
+let hls = null;
+
+let currentObjectURL = null;
+
+let segments = [];
+
+let successfulSegments = 0;
+
+let failedSegments = 0;
+
+let currentSegment = 0;
+
+let originalM3U8URL = "";
+
+let playerMode = "";
+
+let fallbackStarted = false;
+
+let nativeTimer = null;
+
+let hlsFailed = false;
+
+
+/* =========================================================
+   日志
+========================================================= */
+
+function log(message, type = "info") {
+
+    const box =
+        document.getElementById("log");
+
+    const time =
+        new Date().toLocaleTimeString();
+
+    const line =
+        document.createElement("div");
+
+    line.className =
+        "log-line log-" + type;
+
+    line.textContent =
+        `[${time}] ${message}`;
+
+    box.appendChild(line);
+
+    box.scrollTop =
+        box.scrollHeight;
+}
+
+
+function clearLog() {
+
+    document.getElementById("log")
+        .innerHTML = "";
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function setLoading(show, text) {
+
+    const loading =
+        document.getElementById("loading");
+
+    const loadingText =
+        document.getElementById("loadingText");
+
+    loading.classList.toggle(
+        "show",
+        !!show
+    );
+
+    if (text) {
+
+        loadingText.textContent =
+            text;
+    }
+}
+
+
+function setStatus(text) {
+
+    document.getElementById("status")
+        .textContent =
+        text;
+}
+
+
+function updateStats() {
+
+    document.getElementById("total")
+        .textContent =
+        segments.length;
+
+    document.getElementById("success")
+        .textContent =
+        successfulSegments;
+
+    document.getElementById("failed")
+        .textContent =
+        failedSegments;
+
+    document.getElementById("current")
+        .textContent =
+        currentSegment || "-";
+
+    const done =
+        successfulSegments +
+        failedSegments;
+
+    const percent =
+        segments.length
+            ? done / segments.length * 100
+            : 0;
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        percent + "%";
+}
+
+
+/* =========================================================
+   隐藏阿里云
+========================================================= */
+
+function hideAliyunPlayer() {
+
+    const iframe =
+        document.getElementById(
+            "aliyunPlayer"
+        );
+
+    iframe.style.display =
+        "none";
+
+    iframe.src =
+        "about:blank";
+}
+
+
+/* =========================================================
+   停止
+========================================================= */
+
+function stopPlayer() {
+
+    fallbackStarted = false;
+
+    hlsFailed = false;
+
+    if (nativeTimer) {
+
+        clearTimeout(
+            nativeTimer
+        );
+
+        nativeTimer = null;
+    }
+
+    if (hls) {
+
+        try {
+            hls.destroy();
+        } catch(e) {}
+
+        hls = null;
+    }
+
+    const video =
+        document.getElementById("video");
+
+    try {
+
+        video.pause();
+
+        video.removeAttribute("src");
+
+        video.load();
+
+    } catch(e) {}
+
+    hideAliyunPlayer();
+
+    if (currentObjectURL) {
+
+        try {
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+        } catch(e) {}
+
+        currentObjectURL = null;
+    }
+
+    playerMode = "";
+
+    setLoading(false);
+
+    setStatus("已停止");
+}
+
+
+/* =========================================================
+   M3U8
+========================================================= */
+
+async function getM3U8(url) {
+
+    log(
+        "正在读取 M3U8...",
+        "info"
+    );
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "GET",
+                cache: "no-store"
+            }
+        );
+
+    if (!response.ok) {
+
+        throw new Error(
+            `M3U8 HTTP ${response.status}`
+        );
+    }
+
+    const text =
+        await response.text();
+
+    log(
+        `M3U8 获取成功：${text.length} 字符`,
+        "ok"
+    );
+
+    return text;
+}
+
+
+/* =========================================================
+   M3U8 解析
+========================================================= */
+
+function parseM3U8(text) {
+
+    const lines =
+        text
+            .split(/\r?\n/)
+            .map(
+                x => x.trim()
+            );
+
+    segments = [];
+
+    log(
+        `M3U8 共 ${lines.length} 行`,
+        "info"
+    );
+
+    /*
+       保持你的原逻辑：
+       从第 6 行开始
+    */
+
+    let i = 5;
+
+    while (
+        i < lines.length
+    ) {
+
+        const line =
+            lines[i];
+
+        if (
+            line === "#EXT-X-ENDLIST"
+        ) {
+
+            log(
+                "发现 #EXT-X-ENDLIST",
+                "ok"
+            );
+
+            break;
+        }
+
+        if (!line) {
+
+            i++;
+
+            continue;
+        }
+
+        if (
+            !line.startsWith(
+                "#EXTINF:"
+            )
+        ) {
+
+            log(
+                `第 ${i + 1} 行不是 EXTINF，跳过`,
+                "warn"
+            );
+
+            i++;
+
+            continue;
+        }
+
+        const mediaURL =
+            lines[i + 1];
+
+        if (
+            !mediaURL ||
+            mediaURL.startsWith("#")
+        ) {
+
+            log(
+                `第 ${i + 2} 行没有媒体地址`,
+                "warn"
+            );
+
+            i += 2;
+
+            continue;
+        }
+
+        let duration =
+            line
+                .substring(8)
+                .replace(",", "")
+                .trim();
+
+        duration =
+            parseFloat(
+                duration
+            );
+
+        if (
+            Number.isNaN(
+                duration
+            )
+        ) {
+
+            duration = 0;
+        }
+
+        segments.push({
+
+            number:
+                segments.length + 1,
+
+            duration:
+                duration,
+
+            url:
+                mediaURL
+
+        });
+
+        log(
+            `分片 ${segments.length}：${mediaURL}`,
+            "url"
+        );
+
+        i += 2;
+    }
+
+    updateStats();
+
+    log(
+        `✓ 找到 ${segments.length} 个分片`,
+        "ok"
+    );
+
+    return segments;
+}
+
+
+/* =========================================================
+   生成虚拟 M3U8
+========================================================= */
+
+function createVirtualM3U8() {
+
+    let result =
+        "#EXTM3U\n" +
+        "#EXT-X-VERSION:3\n" +
+        "#EXT-X-TARGETDURATION:20\n" +
+        "#EXT-X-MEDIA-SEQUENCE:0\n";
+
+    for (
+        const segment of segments
+    ) {
+
+        result +=
+            "#EXTINF:" +
+            segment.duration +
+            ",\n";
+
+        result +=
+            segment.url +
+            "\n";
+    }
+
+    result +=
+        "#EXT-X-ENDLIST\n";
+
+    return result;
+}
+
+
+/* =========================================================
+   创建 Blob M3U8
+========================================================= */
+
+function createM3U8Blob() {
+
+    const text =
+        createVirtualM3U8();
+
+    log(
+        "虚拟 M3U8 内容：",
+        "dim"
+    );
+
+    log(
+        text,
+        "dim"
+    );
+
+    const blob =
+        new Blob(
+            [text],
+            {
+                type:
+                    "application/vnd.apple.mpegurl"
+            }
+        );
+
+    if (currentObjectURL) {
+
+        try {
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+        } catch(e) {}
+    }
+
+    currentObjectURL =
+        URL.createObjectURL(
+            blob
+        );
+
+    return currentObjectURL;
+}
+
+
+/* =========================================================
+   Fragment Loader
+
+   重点：
+
+   这里只处理 fragment。
+
+   Manifest 不走这里。
+========================================================= */
+
+class CustomFragmentLoader {
+
+    constructor(config) {
+
+        this.config =
+            config || {};
+
+        this.context =
+            null;
+
+        this.stats = null;
+
+        this.controller =
+            null;
+
+        this.aborted =
+            false;
+    }
+
+
+    load(
+        context,
+        config,
+        callbacks
+    ) {
+
+        this.context =
+            context;
+
+        this.aborted =
+            false;
+
+        this.controller =
+            new AbortController();
+
+        /*
+           必须完整初始化 LoaderStats
+        */
+
+        this.stats = {
+
+            trequest:
+                performance.now(),
+
+            tfirst:
+                0,
+
+            tload:
+                0,
+
+            loaded:
+                0,
+
+            total:
+                0
+        };
+
+        const url =
+            context.url;
+
+        log(
+            `开始加载第 ${getFragmentNumber(context)} 片`,
+            "info"
+        );
+
+        log(
+            `媒体 URL：${url}`,
+            "url"
+        );
+
+        fetch(
+            url,
+            {
+                method: "GET",
+                cache: "no-store",
+                signal:
+                    this.controller.signal
+            }
+        )
+        .then(
+            response => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+                }
+
+                this.stats.tfirst =
+                    performance.now();
+
+                const length =
+                    response.headers.get(
+                        "content-length"
+                    );
+
+                if (length) {
+
+                    const parsed =
+                        parseInt(
+                            length,
+                            10
+                        );
+
+                    if (
+                        Number.isFinite(
+                            parsed
+                        )
+                    ) {
+
+                        this.stats.total =
+                            parsed;
+                    }
+                }
+
+                return response.arrayBuffer();
+            }
+        )
+        .then(
+            buffer => {
+
+                if (
+                    this.aborted
+                ) {
+
+                    return;
+                }
+
+                if (
+                    !(buffer instanceof ArrayBuffer)
+                ) {
+
+                    throw new Error(
+                        "媒体响应不是 ArrayBuffer"
+                    );
+                }
+
+                this.stats.loaded =
+                    buffer.byteLength;
+
+                this.stats.total =
+                    this.stats.total ||
+                    buffer.byteLength;
+
+                this.stats.tload =
+                    performance.now();
+
+                const number =
+                    getFragmentNumber(
+                        context
+                    );
+
+                currentSegment =
+                    number;
+
+                successfulSegments++;
+
+                updateStats();
+
+                log(
+                    `✓ 第 ${number} 片读取成功：${buffer.byteLength} bytes`,
+                    "ok"
+                );
+
+                /*
+                   关键：
+
+                   data 必须是 ArrayBuffer
+                */
+
+                callbacks.onSuccess(
+                    {
+                        url:
+                            url,
+
+                        data:
+                            buffer,
+
+                        code:
+                            200
+                    },
+
+                    this.stats,
+
+                    context,
+
+                    null
+                );
+            }
+        )
+        .catch(
+            error => {
+
+                if (
+                    this.aborted
+                ) {
+
+                    return;
+                }
+
+                failedSegments++;
+
+                updateStats();
+
+                log(
+                    `媒体请求失败：${error.message}`,
+                    "error"
+                );
+
+                callbacks.onError(
+                    {
+                        code:
+                            0,
+
+                        text:
+                            error.message
+                    },
+
+                    context,
+
+                    null,
+
+                    this.stats
+                );
+            }
+        );
+    }
+
+
+    abort() {
+
+        this.aborted =
+            true;
+
+        if (
+            this.controller
+        ) {
+
+            try {
+                this.controller.abort();
+            } catch(e) {}
+        }
+    }
+
+
+    destroy() {
+
+        this.abort();
+
+        this.controller =
+            null;
+
+        this.context =
+            null;
+
+        this.stats =
+            null;
+    }
+}
+
+
+/* =========================================================
+   计算分片编号
+========================================================= */
+
+function getFragmentNumber(context) {
+
+    if (
+        context &&
+        context.frag
+    ) {
+
+        if (
+            Number.isFinite(
+                context.frag.sn
+            )
+        ) {
+
+            return (
+                context.frag.sn + 1
+            );
+        }
+    }
+
+    return (
+        currentSegment + 1
+    );
+}
+
+
+/* =========================================================
+   阿里云
+========================================================= */
+
+function getAliyunURL(source) {
+
+    return (
+        "https://video.aliyuncs.com/player-detection/index.html?source=" +
+        encodeURIComponent(source)
+    );
+}
+
+
+function openAliyunPlayer() {
+
+    const url =
+        document
+            .getElementById(
+                "m3u8Input"
+            )
+            .value
+            .trim();
+
+    if (!url) {
+
+        alert(
+            "请先输入 M3U8 地址"
+        );
+
+        return;
+    }
+
+    originalM3U8URL =
+        url;
+
+    if (hls) {
+
+        try {
+            hls.destroy();
+        } catch(e) {}
+
+        hls = null;
+    }
+
+    const video =
+        document.getElementById(
+            "video"
+        );
+
+    try {
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+    } catch(e) {}
+
+    const iframe =
+        document.getElementById(
+            "aliyunPlayer"
+        );
+
+    const aliyunURL =
+        getAliyunURL(
+            url
+        );
+
+    log(
+        "正在切换到阿里云原生 H5...",
+        "warn"
+    );
+
+    log(
+        `阿里云 Source：${url}`,
+        "url"
+    );
+
+    iframe.src =
+        aliyunURL;
+
+    iframe.style.display =
+        "block";
+
+    playerMode =
+        "aliyun";
+
+    setLoading(false);
+
+    setStatus(
+        "阿里云原生 H5"
+    );
+
+    log(
+        "✓ 已切换到阿里云播放器诊断页面",
+        "ok"
+    );
+}
+
+
+/* =========================================================
+   原生 H5
+========================================================= */
+
+function startNativeH5(url) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const video =
+                document.getElementById(
+                    "video"
+                );
+
+            playerMode =
+                "native";
+
+            hideAliyunPlayer();
+
+            log(
+                "① 尝试原生 H5",
+                "info"
+            );
+
+            let settled =
+                false;
+
+            function cleanup() {
+
+                video.removeEventListener(
+                    "playing",
+                    onPlaying
+                );
+
+                video.removeEventListener(
+                    "error",
+                    onError
+                );
+
+                if (nativeTimer) {
+
+                    clearTimeout(
+                        nativeTimer
+                    );
+
+                    nativeTimer =
+                        null;
+                }
+            }
+
+            function onPlaying() {
+
+                if (settled) {
+                    return;
+                }
+
+                settled =
+                    true;
+
+                cleanup();
+
+                log(
+                    "✓ 原生 H5 开始播放",
+                    "ok"
+                );
+
+                setLoading(false);
+
+                setStatus(
+                    "原生 H5 播放中"
+                );
+
+                resolve();
+            }
+
+            function onError() {
+
+                if (settled) {
+                    return;
+                }
+
+                const error =
+                    video.error;
+
+                let message =
+                    "Video error";
+
+                if (error) {
+
+                    message =
+                        `Video错误代码 ${error.code}`;
+                }
+
+                cleanup();
+
+                settled =
+                    true;
+
+                log(
+                    `原生 H5 播放失败：${message}`,
+                    "warn"
+                );
+
+                reject(
+                    new Error(
+                        message
+                    )
+                );
+            }
+
+            video.addEventListener(
+                "playing",
+                onPlaying
+            );
+
+            video.addEventListener(
+                "error",
+                onError
+            );
+
+            video.src =
+                url;
+
+            video.load();
+
+            const promise =
+                video.play();
+
+            if (
+                promise &&
+                typeof promise.catch ===
+                "function"
+            ) {
+
+                promise.catch(
+                    error => {
+
+                        if (
+                            error &&
+                            error.name ===
+                            "NotAllowedError"
+                        ) {
+
+                            log(
+                                "浏览器阻止自动播放，请点击播放",
+                                "warn"
+                            );
+
+                            setLoading(false);
+
+                            setStatus(
+                                "请点击播放"
+                            );
+
+                            return;
+                        }
+
+                        onError();
+                    }
+                );
+            }
+
+            nativeTimer =
+                setTimeout(
+                    () => {
+
+                        if (
+                            !settled
+                        ) {
+
+                            cleanup();
+
+                            settled =
+                                true;
+
+                            log(
+                                "原生 H5 8 秒内没有开始播放",
+                                "warn"
+                            );
+
+                            reject(
+                                new Error(
+                                    "原生 H5 超时"
+                                )
+                            );
+                        }
+
+                    },
+                    8000
+                );
+        }
+    );
+}
+
+
+/* =========================================================
+   hls.js
+========================================================= */
+
+function startHLS(blobURL) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const video =
+                document.getElementById(
+                    "video"
+                );
+
+            playerMode =
+                "hls";
+
+            hlsFailed =
+                false;
+
+            hideAliyunPlayer();
+
+            if (!window.Hls) {
+
+                reject(
+                    new Error(
+                        "hls.js 没有加载"
+                    )
+                );
+
+                return;
+            }
+
+            if (
+                !Hls.isSupported()
+            ) {
+
+                reject(
+                    new Error(
+                        "当前浏览器不支持 MSE"
+                    )
+                );
+
+                return;
+            }
+
+            log(
+                "③ 启动 hls.js",
+                "info"
+            );
+
+            log(
+                `hls.js 版本：${Hls.version || "unknown"}`,
+                "dim"
+            );
+
+            /*
+               非常重要：
+
+               loader：
+
+               Manifest → 默认 loader
+
+               Fragment → CustomFragmentLoader
+            */
+
+            const config = {
+
+                enableWorker:
+                    true,
+
+                lowLatencyMode:
+                    false,
+
+                backBufferLength:
+                    60,
+
+                maxBufferLength:
+                    30,
+
+                maxMaxBufferLength:
+                    60,
+
+                manifestLoadingMaxRetry:
+                    2,
+
+                fragLoadingMaxRetry:
+                    2,
+
+                manifestLoadingRetryDelay:
+                    1000,
+
+                fragLoadingRetryDelay:
+                    1000,
+
+                fLoader:
+                    CustomFragmentLoader
+
+            };
+
+            /*
+               某些 hls.js 版本不接受
+               fLoader 时使用 loader config。
+
+               当前官方版本使用 fLoader
+               处理 fragment。
+            */
+
+            try {
+
+                hls =
+                    new Hls(
+                        config
+                    );
+
+            } catch(error) {
+
+                reject(error);
+
+                return;
+            }
+
+            let manifestParsed =
+                false;
+
+            let firstFragment =
+                false;
+
+            let finished =
+                false;
+
+            function fail(error) {
+
+                if (finished) {
+                    return;
+                }
+
+                finished =
+                    true;
+
+                try {
+
+                    if (hls) {
+                        hls.destroy();
+                    }
+
+                } catch(e) {}
+
+                hls = null;
+
+                reject(error);
+            }
+
+            hls.on(
+
+                Hls.Events.MEDIA_ATTACHED,
+
+                () => {
+
+                    log(
+                        "✓ 视频已连接到 hls.js",
+                        "ok"
+                    );
+
+                    log(
+                        "默认 Loader：manifest",
+                        "dim"
+                    );
+
+                    log(
+                        "Custom Loader：fragment",
+                        "dim"
+                    );
+
+                    setStatus(
+                        "hls.js 已连接"
+                    );
+
+                    log(
+                        "正在加载虚拟 M3U8...",
+                        "info"
+                    );
+
+                    try {
+
+                        hls.loadSource(
+                            blobURL
+                        );
+
+                    } catch(error) {
+
+                        fail(error);
+                    }
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.MANIFEST_LOADING,
+
+                () => {
+
+                    log(
+                        "正在加载虚拟 M3U8...",
+                        "info"
+                    );
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.MANIFEST_PARSED,
+
+                (
+                    event,
+                    data
+                ) => {
+
+                    manifestParsed =
+                        true;
+
+                    log(
+                        `✓ M3U8 解析成功：${data.levels.length} 个 Level`,
+                        "ok"
+                    );
+
+                    log(
+                        "✓ 虚拟 M3U8 加载完成",
+                        "ok"
+                    );
+
+                    setLoading(
+                        false
+                    );
+
+                    setStatus(
+                        "M3U8 已解析"
+                    );
+
+                    /*
+                       不在这里强制播放。
+
+                       等第一片真正进入 MSE。
+                    */
+
+                    video.play()
+                        .then(
+                            () => {
+
+                                log(
+                                    "✓ hls.js 自动播放成功",
+                                    "ok"
+                                );
+                            }
+                        )
+                        .catch(
+                            error => {
+
+                                if (
+                                    error &&
+                                    error.name ===
+                                    "NotAllowedError"
+                                ) {
+
+                                    log(
+                                        "浏览器阻止自动播放，请点击播放",
+                                        "warn"
+                                    );
+
+                                    setStatus(
+                                        "请点击播放"
+                                    );
+
+                                } else {
+
+                                    log(
+                                        `play()：${error.message}`,
+                                        "warn"
+                                    );
+                                }
+                            }
+                        );
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.FRAG_LOADING,
+
+                (
+                    event,
+                    data
+                ) => {
+
+                    const sn =
+                        data &&
+                        data.frag
+                            ? data.frag.sn
+                            : 0;
+
+                    currentSegment =
+                        sn + 1;
+
+                    firstFragment =
+                        true;
+
+                    document.getElementById(
+                        "current"
+                    ).textContent =
+                        currentSegment;
+
+                    setStatus(
+                        `正在加载第 ${currentSegment} 片`
+                    );
+
+                    log(
+                        `开始加载第 ${currentSegment} 片`,
+                        "info"
+                    );
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.FRAG_LOADED,
+
+                (
+                    event,
+                    data
+                ) => {
+
+                    const sn =
+                        data &&
+                        data.frag
+                            ? data.frag.sn
+                            : 0;
+
+                    log(
+                        `✓ hls.js 第 ${sn + 1} 片加载完成`,
+                        "ok"
+                    );
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.FRAG_BUFFERED,
+
+                (
+                    event,
+                    data
+                ) => {
+
+                    const sn =
+                        data &&
+                        data.frag
+                            ? data.frag.sn
+                            : 0;
+
+                    log(
+                        `✓ 第 ${sn + 1} 片已进入缓冲区`,
+                        "ok"
+                    );
+
+                    successfulSegments++;
+
+                    updateStats();
+
+                    setLoading(false);
+
+                    setStatus(
+                        `正在播放第 ${sn + 1} 片`
+                    );
+
+                    if (
+                        !finished
+                    ) {
+
+                        finished =
+                            true;
+
+                        resolve();
+                    }
+                }
+            );
+
+            hls.on(
+
+                Hls.Events.ERROR,
+
+                (
+                    event,
+                    data
+                ) => {
+
+                    const type =
+                        data.type || "";
+
+                    const details =
+                        data.details || "";
+
+                    log(
+                        `HLS：${type} / ${details}`,
+                        data.fatal
+                            ? "error"
+                            : "warn"
+                    );
+
+                    /*
+                       特别处理内部错误
+                    */
+
+                    if (
+                        data.details ===
+                        Hls.ErrorDetails.INTERNAL_EXCEPTION
+                    ) {
+
+                        log(
+                            "检测到 hls.js INTERNAL_EXCEPTION",
+                            "error"
+                        );
+
+                        if (
+                            data.error
+                        ) {
+
+                            log(
+                                `内部异常：${data.error.message || data.error}`,
+                                "error"
+                            );
+                        }
+
+                        fail(
+                            new Error(
+                                "hls.js INTERNAL_EXCEPTION"
+                            )
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        !data.fatal
+                    ) {
+
+                        return;
+                    }
+
+                    if (
+                        type ===
+                        Hls.ErrorTypes.NETWORK_ERROR
+                    ) {
+
+                        log(
+                            "⚠ HLS 网络错误",
+                            "warn"
+                        );
+
+                        try {
+
+                            hls.startLoad();
+
+                        } catch(error) {
+
+                            fail(error);
+                        }
+
+                        return;
+                    }
+
+                    if (
+                        type ===
+                        Hls.ErrorTypes.MEDIA_ERROR
+                    ) {
+
+                        log(
+                            "⚠ HLS 媒体错误，尝试恢复",
+                            "warn"
+                        );
+
+                        try {
+
+                            hls.recoverMediaError();
+
+                        } catch(error) {
+
+                            fail(error);
+                        }
+
+                        return;
+                    }
+
+                    fail(
+                        new Error(
+                            `HLS fatal：${type} / ${details}`
+                        )
+                    );
+                }
+            );
+
+            /*
+               Video error 不直接触发 fallback。
+               交给 hls.js 判断。
+            */
+
+            hls.attachMedia(
+                video
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   fallback HLS
+========================================================= */
+
+async function fallbackToHLS() {
+
+    if (
+        fallbackStarted
+    ) {
+
+        return;
+    }
+
+    fallbackStarted =
+        true;
+
+    log(
+        "② 原生 H5 播放失败",
+        "warn"
+    );
+
+    log(
+        "③ 切换到 hls.js + CustomFragmentLoader",
+        "info"
+    );
+
+    setLoading(
+        true,
+        "正在启动 hls.js..."
+    );
+
+    setStatus(
+        "正在切换 hls.js"
+    );
+
+    const virtualURL =
+        createM3U8Blob();
+
+    log(
+        "✓ 已生成虚拟 M3U8",
+        "ok"
+    );
+
+    try {
+
+        await startHLS(
+            virtualURL
+        );
+
+        log(
+            "✓ hls.js 已成功进入播放流程",
+            "ok"
+        );
+
+    } catch(error) {
+
+        log(
+            `❌ hls.js 启动失败：${error.message}`,
+            "error"
+        );
+
+        fallbackToAliyun();
+    }
+}
+
+
+/* =========================================================
+   fallback Aliyun
+========================================================= */
+
+function fallbackToAliyun() {
+
+    if (
+        playerMode ===
+        "aliyun"
+    ) {
+
+        return;
+    }
+
+    log(
+        "④ hls.js 无法继续播放",
+        "error"
+    );
+
+    log(
+        "⑤ 切换到阿里云原生 H5",
+        "warn"
+    );
+
+    setLoading(
+        true,
+        "正在切换阿里云 H5..."
+    );
+
+    setTimeout(
+        () => {
+
+            openAliyunPlayer();
+
+        },
+        300
+    );
+}
+
+
+/* =========================================================
+   开始播放
+========================================================= */
+
+async function startPlayer() {
+
+    stopPlayer();
+
+    segments = [];
+
+    successfulSegments = 0;
+
+    failedSegments = 0;
+
+    currentSegment = 0;
+
+    fallbackStarted =
+        false;
+
+    updateStats();
+
+    setLoading(
+        true,
+        "正在读取 M3U8..."
+    );
+
+    setStatus(
+        "正在读取 M3U8"
+    );
+
+    const url =
+        document
+            .getElementById(
+                "m3u8Input"
+            )
+            .value
+            .trim();
+
+    if (!url) {
+
+        setLoading(false);
+
+        alert(
+            "请输入 M3U8 地址"
+        );
+
+        return;
+    }
+
+    originalM3U8URL =
+        url;
+
+    try {
+
+        log(
+            "================================",
+            "dim"
+        );
+
+        log(
+            "开始播放",
+            "info"
+        );
+
+        log(
+            `M3U8：${url}`,
+            "url"
+        );
+
+        /*
+           第一步：
+           读取 M3U8
+        */
+
+        const text =
+            await getM3U8(
+                url
+            );
+
+        /*
+           第二步：
+           解析分片
+        */
+
+        parseM3U8(
+            text
+        );
+
+        if (
+            segments.length === 0
+        ) {
+
+            throw new Error(
+                "没有找到有效媒体分片"
+            );
+        }
+
+        /*
+           第三步：
+           原生 H5
+        */
+
+        try {
+
+            await startNativeH5(
+                url
+            );
+
+            setLoading(false);
+
+            return;
+
+        } catch(error) {
+
+            log(
+                `原生 H5 失败：${error.message}`,
+                "warn"
+            );
+        }
+
+        /*
+           第四步：
+           hls.js
+        */
+
+        await fallbackToHLS();
+
+    } catch(error) {
+
+        console.error(error);
+
+        log(
+            `❌ 播放启动失败：${error.message}`,
+            "error"
+        );
+
+        setLoading(false);
+
+        setStatus(
+            "播放失败"
+        );
+
+        /*
+           最终诊断
+        */
+
+        setTimeout(
+            () => {
+
+                openAliyunPlayer();
+
+            },
+            300
+        );
+    }
+}
+
+
+/* =========================================================
+   Video 事件
+========================================================= */
+
+const video =
+    document.getElementById(
+        "video"
+    );
+
+
+video.addEventListener(
+    "playing",
+    () => {
+
+        setLoading(false);
+
+        if (
+            playerMode ===
+            "hls"
+        ) {
+
+            setStatus(
+                "hls.js 正在播放"
+            );
+
+        } else if (
+            playerMode ===
+            "native"
+        ) {
+
+            setStatus(
+                "原生 H5 正在播放"
+            );
+        }
+
+        log(
+            "▶ 视频开始播放",
+            "ok"
+        );
+    }
+);
+
+
+video.addEventListener(
+    "waiting",
+    () => {
+
+        if (
+            playerMode !==
+            "aliyun"
+        ) {
+
+            setLoading(
+                true,
+                "正在缓冲..."
+            );
+
+            setStatus(
+                "缓冲中"
+            );
+        }
+    }
+);
+
+
+video.addEventListener(
+    "canplay",
+    () => {
+
+        if (
+            playerMode !==
+            "aliyun"
+        ) {
+
+            setLoading(false);
+
+            setStatus(
+                playerMode === "hls"
+                    ? "hls.js 可以播放"
+                    : "原生 H5 可以播放"
+            );
+        }
+    }
+);
+
+
+video.addEventListener(
+    "ended",
+    () => {
+
+        setLoading(false);
+
+        setStatus(
+            "播放结束"
+        );
+
+        log(
+            "播放结束",
+            "ok"
+        );
+    }
+);
+
+
+video.addEventListener(
+    "error",
+    () => {
+
+        const error =
+            video.error;
+
+        if (error) {
+
+            log(
+                `Video 错误：${error.code}`,
+                "error"
+            );
+
+            if (
+                error.message
+            ) {
+
+                log(
+                    `Video：${error.message}`,
+                    "error"
+                );
+            }
+        }
+
+        /*
+           只有 native 阶段
+           才在 Video error 时 fallback。
+
+           hls.js 自己处理。
+        */
+
+        if (
+            playerMode ===
+            "native"
+        ) {
+
+            fallbackToHLS();
+        }
+    }
+);
+
+
+/* =========================================================
+   初始化
+========================================================= */
+
+log(
+    "PNG 伪装 TS Loader 已启动",
+    "ok"
+);
+
+log(
+    "Manifest：hls.js 默认 Loader",
+    "info"
+);
+
+log(
+    "Fragment：CustomFragmentLoader",
+    "info"
+);
+
+log(
+    "工作模式：原生 H5 → hls.js → 阿里云",
+    "info"
+);
+
+log(
+    "M3U8：过滤前5行 → EXTINF/URL → ENDLIST",
+    "info"
+);
+
+</script>
+
+</body>
+</html>
