@@ -22,8 +22,11 @@ html,
 body {
     margin: 0;
     padding: 0;
+
     background: #07090e;
+
     color: #e9edf5;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -37,140 +40,284 @@ body {
 }
 
 .container {
-    width: min(920px, calc(100% - 24px));
-    margin: 20px auto 60px;
+
+    width:
+        min(920px, calc(100% - 24px));
+
+    margin:
+        20px auto 60px;
 }
 
 .header {
+
     padding: 22px;
+
     border-radius: 22px;
+
     background:
         linear-gradient(
             145deg,
             #141a27,
             #0e121b
         );
-    border: 1px solid #252c3a;
+
+    border:
+        1px solid #252c3a;
+
     box-shadow:
         0 15px 45px rgba(0,0,0,.35);
+
     margin-bottom: 18px;
 }
 
 .header h1 {
-    margin: 0 0 8px;
-    font-size: 25px;
+
+    margin:
+        0 0 8px;
+
+    font-size:
+        25px;
 }
 
 .header p {
+
     margin: 0;
-    color: #929bad;
-    font-size: 14px;
-    line-height: 1.7;
+
+    color:
+        #929bad;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.7;
 }
 
 .card {
-    background: #111620;
-    border: 1px solid #252c3a;
-    border-radius: 22px;
-    padding: 20px;
-    margin-bottom: 18px;
+
+    background:
+        #111620;
+
+    border:
+        1px solid #252c3a;
+
+    border-radius:
+        22px;
+
+    padding:
+        20px;
+
+    margin-bottom:
+        18px;
+
     box-shadow:
         0 12px 40px rgba(0,0,0,.25);
 }
 
 label {
+
     display: block;
-    margin-bottom: 8px;
-    color: #aeb7c8;
-    font-size: 14px;
+
+    margin-bottom:
+        8px;
+
+    color:
+        #aeb7c8;
+
+    font-size:
+        14px;
 }
 
 input {
+
     width: 100%;
-    height: 48px;
-    padding: 0 15px;
-    border-radius: 13px;
-    border: 1px solid #303848;
+
+    height:
+        48px;
+
+    padding:
+        0 15px;
+
+    border-radius:
+        13px;
+
+    border:
+        1px solid #303848;
+
     outline: none;
-    background: #090c12;
-    color: #fff;
-    font-size: 14px;
+
+    background:
+        #090c12;
+
+    color:
+        #fff;
+
+    font-size:
+        14px;
 }
 
 input:focus {
-    border-color: #6b8cff;
+
+    border-color:
+        #6b8cff;
 }
 
 .buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-    flex-wrap: wrap;
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    margin-top:
+        14px;
+
+    flex-wrap:
+        wrap;
 }
 
 button {
+
     border: 0;
-    border-radius: 13px;
-    padding: 13px 20px;
-    background: #2a3243;
-    color: #fff;
-    font-size: 15px;
-    cursor: pointer;
+
+    border-radius:
+        13px;
+
+    padding:
+        13px 20px;
+
+    background:
+        #2a3243;
+
+    color:
+        #fff;
+
+    font-size:
+        15px;
+
+    cursor:
+        pointer;
 }
 
 button.primary {
-    background: #596fff;
+
+    background:
+        #596fff;
 }
 
 button.danger {
-    background: #8f3343;
+
+    background:
+        #8f3343;
 }
 
 button:disabled {
-    opacity: .45;
-    cursor: not-allowed;
+
+    opacity:
+        .45;
+
+    cursor:
+        not-allowed;
 }
 
 .video-box {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    border-radius: 18px;
-    overflow: hidden;
+
+    position:
+        relative;
+
+    width:
+        100%;
+
+    aspect-ratio:
+        16 / 9;
+
+    background:
+        #000;
+
+    border-radius:
+        18px;
+
+    overflow:
+        hidden;
 }
 
 video {
-    width: 100%;
-    height: 100%;
-    display: block;
-    background: #000;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    display:
+        block;
+
+    background:
+        #000;
 }
 
 .aliyun-player {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    background: #000;
-    display: none;
-    z-index: 10;
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    border:
+        0;
+
+    background:
+        #000;
+
+    display:
+        none;
 }
 
 .loading {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    background: rgba(0,0,0,.55);
-    backdrop-filter: blur(5px);
-    pointer-events: none;
-    opacity: 0;
-    transition: .25s;
-    z-index: 20;
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
+
+    background:
+        rgba(0,0,0,.55);
+
+    backdrop-filter:
+        blur(5px);
+
+    pointer-events:
+        none;
+
+    opacity:
+        0;
+
+    transition:
+        .25s;
+
+    z-index:
+        20;
 }
 
 .loading.show {
@@ -178,18 +325,34 @@ video {
 }
 
 .spinner {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    border: 5px solid rgba(255,255,255,.18);
-    border-top-color: #fff;
-    animation: spin .8s linear infinite;
-    margin-bottom: 14px;
+
+    width:
+        54px;
+
+    height:
+        54px;
+
+    border-radius:
+        50%;
+
+    border:
+        5px solid rgba(255,255,255,.18);
+
+    border-top-color:
+        #fff;
+
+    animation:
+        spin .8s linear infinite;
+
+    margin-bottom:
+        14px;
 }
 
 @keyframes spin {
+
     to {
-        transform: rotate(360deg);
+        transform:
+            rotate(360deg);
     }
 }
 
@@ -198,88 +361,185 @@ video {
 }
 
 .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 15px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap:
+        10px;
+
+    margin-top:
+        15px;
 }
 
 .stat {
-    background: #090c12;
-    border-radius: 15px;
-    padding: 15px;
+
+    background:
+        #090c12;
+
+    border-radius:
+        15px;
+
+    padding:
+        15px;
 }
 
 .stat-title {
-    color: #818a9c;
-    font-size: 13px;
-    margin-bottom: 8px;
+
+    color:
+        #818a9c;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        8px;
 }
 
 .stat-value {
-    font-size: 22px;
-    font-weight: 600;
+
+    font-size:
+        22px;
+
+    font-weight:
+        600;
 }
 
 .progress {
-    height: 8px;
-    background: #292f3c;
-    border-radius: 99px;
-    overflow: hidden;
-    margin-top: 15px;
+
+    height:
+        8px;
+
+    background:
+        #292f3c;
+
+    border-radius:
+        99px;
+
+    overflow:
+        hidden;
+
+    margin-top:
+        15px;
 }
 
 .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #6578ff;
-    transition: width .2s;
+
+    height:
+        100%;
+
+    width:
+        0%;
+
+    background:
+        #6578ff;
+
+    transition:
+        width .2s;
 }
 
 .status {
-    margin-top: 12px;
-    display: inline-block;
-    padding: 8px 13px;
-    border-radius: 99px;
-    background: #20283a;
-    color: #b9c3d7;
-    font-size: 13px;
+
+    margin-top:
+        12px;
+
+    display:
+        inline-block;
+
+    padding:
+        8px 13px;
+
+    border-radius:
+        99px;
+
+    background:
+        #20283a;
+
+    color:
+        #b9c3d7;
+
+    font-size:
+        13px;
 }
 
 .log-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    margin-bottom:
+        12px;
 }
 
 .log-title h2 {
-    margin: 0;
-    font-size: 20px;
+
+    margin:
+        0;
+
+    font-size:
+        20px;
 }
 
 .badge {
-    padding: 7px 12px;
-    border-radius: 99px;
-    background: #222a3b;
-    color: #b8c2d6;
-    font-size: 13px;
+
+    padding:
+        7px 12px;
+
+    border-radius:
+        99px;
+
+    background:
+        #222a3b;
+
+    color:
+        #b8c2d6;
+
+    font-size:
+        13px;
 }
 
 .log {
-    height: 400px;
-    overflow-y: auto;
-    padding: 17px;
-    background: #05070b;
-    border-radius: 16px;
+
+    height:
+        400px;
+
+    overflow-y:
+        auto;
+
+    padding:
+        17px;
+
+    background:
+        #05070b;
+
+    border-radius:
+        16px;
+
     font-family:
         "Consolas",
         "Courier New",
         monospace;
-    font-size: 13px;
-    line-height: 1.9;
-    white-space: pre-wrap;
-    word-break: break-word;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.9;
+
+    white-space:
+        pre-wrap;
+
+    word-break:
+        break-word;
 }
 
 .log-line {
@@ -311,54 +571,93 @@ video {
 }
 
 .clear {
-    width: 100%;
-    margin-top: 12px;
+
+    width:
+        100%;
+
+    margin-top:
+        12px;
 }
 
 .notice {
-    margin-top: 13px;
-    padding: 13px 15px;
-    border-radius: 13px;
-    background: #171d2a;
-    color: #aeb8c9;
-    font-size: 13px;
-    line-height: 1.7;
+
+    margin-top:
+        13px;
+
+    padding:
+        13px 15px;
+
+    border-radius:
+        13px;
+
+    background:
+        #171d2a;
+
+    color:
+        #aeb8c9;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.7;
 }
 
 @media(max-width:650px) {
 
     .container {
-        width: calc(100% - 16px);
-        margin-top: 10px;
+
+        width:
+            calc(100% - 16px);
+
+        margin-top:
+            10px;
     }
 
     .card {
-        padding: 14px;
-        border-radius: 18px;
+
+        padding:
+            14px;
+
+        border-radius:
+            18px;
     }
 
     .header {
-        padding: 17px;
-        border-radius: 18px;
+
+        padding:
+            17px;
+
+        border-radius:
+            18px;
     }
 
     .header h1 {
-        font-size: 21px;
+
+        font-size:
+            21px;
     }
 
     .stats {
-        grid-template-columns: repeat(2, 1fr);
+
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 
     .log {
-        height: 420px;
-        font-size: 12px;
+
+        height:
+            420px;
+
+        font-size:
+            12px;
     }
 }
 
 </style>
 
 </head>
+
 
 <body>
 
@@ -371,7 +670,7 @@ video {
     </h1>
 
     <p>
-        原生 H5 → hls.js + MSE → 阿里云原生 H5 诊断播放器
+        原生 H5 → hls.js → 阿里云原生 H5 诊断播放器
     </p>
 
 </div>
@@ -387,7 +686,6 @@ video {
         id="m3u8Input"
         type="text"
         placeholder="请输入 M3U8 地址"
-        value=""
         autocomplete="off"
         autocapitalize="off"
         spellcheck="false"
@@ -420,6 +718,7 @@ video {
 
     </div>
 
+
     <div class="notice">
 
         当前解析规则：
@@ -441,7 +740,15 @@ video {
         播放顺序：
 
         <b>
-            原生 H5 → hls.js + MSE → 阿里云 H5
+            原生 H5 → hls.js → 阿里云播放器诊断页
+        </b>
+
+        <br>
+
+        hls.js：
+
+        <b>
+            Manifest 使用默认 Loader，Fragment 使用 CustomTSLoader
         </b>
 
     </div>
@@ -457,9 +764,9 @@ video {
             id="video"
             controls
             playsinline
-            webkit-playsinline
             preload="metadata">
         </video>
+
 
         <iframe
             id="aliyunPlayer"
@@ -467,6 +774,7 @@ video {
             allow="autoplay; fullscreen"
             allowfullscreen>
         </iframe>
+
 
         <div
             id="loading"
@@ -498,9 +806,7 @@ video {
             <div
                 id="total"
                 class="stat-value">
-
                 0
-
             </div>
 
         </div>
@@ -515,9 +821,7 @@ video {
             <div
                 id="success"
                 class="stat-value">
-
                 0
-
             </div>
 
         </div>
@@ -526,15 +830,13 @@ video {
         <div class="stat">
 
             <div class="stat-title">
-                失败/跳过
+                跳过
             </div>
 
             <div
                 id="failed"
                 class="stat-value">
-
                 0
-
             </div>
 
         </div>
@@ -549,9 +851,7 @@ video {
             <div
                 id="current"
                 class="stat-value">
-
                 -
-
             </div>
 
         </div>
@@ -594,10 +894,12 @@ video {
 
     </div>
 
+
     <div
         id="log"
         class="log">
     </div>
+
 
     <button
         class="clear"
@@ -620,6 +922,8 @@ video {
 
 let hls = null;
 
+let mediaSource = null;
+
 let currentObjectURL = null;
 
 let segments = [];
@@ -637,6 +941,8 @@ let playerMode = "";
 let fallbackStarted = false;
 
 let fallbackTimer = null;
+
+let playGeneration = 0;
 
 
 /* =========================================================
@@ -764,38 +1070,21 @@ function hideAliyunPlayer() {
 
 
 /* =========================================================
-   清理 Video
-========================================================= */
-
-function resetVideo() {
-
-    const video =
-        document.getElementById(
-            "video"
-        );
-
-    try {
-
-        video.pause();
-
-        video.removeAttribute(
-            "src"
-        );
-
-        video.load();
-
-    } catch(e) {}
-
-}
-
-
-/* =========================================================
    停止播放器
 ========================================================= */
 
 function stopPlayer() {
 
-    fallbackStarted = false;
+    /*
+     * 让旧的异步任务全部失效
+     */
+
+    playGeneration++;
+
+
+    fallbackStarted =
+        false;
+
 
     if (fallbackTimer) {
 
@@ -813,13 +1102,32 @@ function stopPlayer() {
 
             hls.destroy();
 
-        } catch(e) {}
+        } catch(e) {
+
+            console.warn(e);
+        }
 
         hls = null;
     }
 
 
-    resetVideo();
+    const video =
+        document.getElementById(
+            "video"
+        );
+
+
+    try {
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+    } catch(e) {}
 
 
     hideAliyunPlayer();
@@ -835,15 +1143,18 @@ function stopPlayer() {
 
         } catch(e) {}
 
-        currentObjectURL = null;
+        currentObjectURL =
+            null;
     }
+
+
+    playerMode =
+        "";
 
 
     setLoading(false);
 
     setStatus("已停止");
-
-    playerMode = "";
 
 
     log(
@@ -854,7 +1165,7 @@ function stopPlayer() {
 
 
 /* =========================================================
-   读取 M3U8
+   M3U8
 ========================================================= */
 
 async function getM3U8(url) {
@@ -867,10 +1178,15 @@ async function getM3U8(url) {
 
     const response =
         await fetch(
+
             url,
+
             {
-                method: "GET",
-                cache: "no-store"
+                method:
+                    "GET",
+
+                cache:
+                    "no-store"
             }
         );
 
@@ -922,8 +1238,8 @@ function parseM3U8(text) {
 
 
     /*
-     * 保持你的原始规则：
-     * 前 5 行过滤
+     * 保持原来的规则：
+     * 前5行过滤
      */
 
     let i = 5;
@@ -1064,24 +1380,20 @@ class CustomTSLoader {
 
     constructor(config) {
 
-        this.config = config;
+        this.config =
+            config;
 
-        this.controller = null;
+        this.loader =
+            null;
 
-        this.aborted = false;
+        this.controller =
+            null;
 
-        this.stats = {
+        this.aborted =
+            false;
 
-            trequest: 0,
-
-            tfirst: 0,
-
-            tload: 0,
-
-            loaded: 0,
-
-            total: 0
-        };
+        this.stats =
+            null;
     }
 
 
@@ -1091,44 +1403,123 @@ class CustomTSLoader {
         callbacks
     ) {
 
-        this.aborted = false;
+        this.aborted =
+            false;
+
+
+        /*
+         * =====================================================
+         * Manifest / Level / Audio / Subtitle
+         *
+         * 全部交给默认 Loader
+         * =====================================================
+         */
+
+        if (
+            context.type !==
+            "fragment"
+        ) {
+
+            log(
+                `默认 Loader：${context.type}`,
+                "info"
+            );
+
+
+            const DefaultLoader =
+                Hls.DefaultConfig.loader;
+
+
+            this.loader =
+                new DefaultLoader(
+                    config
+                );
+
+
+            this.loader.load(
+                context,
+                config,
+                callbacks
+            );
+
+
+            return;
+        }
+
+
+        /*
+         * =====================================================
+         * Fragment
+         *
+         * 只有媒体分片进入这里
+         * =====================================================
+         */
+
+        const url =
+            context.url;
+
+
+        log(
+            `CustomTSLoader 请求分片：${url}`,
+            "url"
+        );
 
 
         this.controller =
             new AbortController();
 
 
+        /*
+         * 新版 hls.js stats
+         */
+
         this.stats = {
 
-            trequest:
-                performance.now(),
+            aborted:
+                false,
 
-            tfirst: 0,
+            loaded:
+                0,
 
-            tload: 0,
+            total:
+                0,
 
-            loaded: 0,
+            retry:
+                0,
 
-            total: 0
+            loading: {
+
+                start:
+                    performance.now(),
+
+                first:
+                    0,
+
+                end:
+                    0
+            },
+
+            parsing: {
+
+                start:
+                    0,
+
+                end:
+                    0
+            },
+
+            buffering: {
+
+                start:
+                    0,
+
+                first:
+                    0,
+
+                end:
+                    0
+            }
         };
-
-
-        const url =
-            context.url;
-
-
-        const isFragment =
-            context.type ===
-            "fragment";
-
-
-        if (isFragment) {
-
-            log(
-                `请求媒体：${url}`,
-                "url"
-            );
-        }
 
 
         fetch(
@@ -1163,7 +1554,7 @@ class CustomTSLoader {
                 }
 
 
-                this.stats.tfirst =
+                this.stats.loading.first =
                     performance.now();
 
 
@@ -1173,13 +1564,26 @@ class CustomTSLoader {
                     );
 
 
-                if (length) {
+                if (
+                    length
+                ) {
 
-                    this.stats.total =
+                    const parsed =
                         parseInt(
                             length,
                             10
                         );
+
+
+                    if (
+                        !Number.isNaN(
+                            parsed
+                        )
+                    ) {
+
+                        this.stats.total =
+                            parsed;
+                    }
                 }
 
 
@@ -1204,9 +1608,19 @@ class CustomTSLoader {
                     buffer.byteLength;
 
 
-                this.stats.tload =
+                this.stats.loading.end =
                     performance.now();
 
+
+                log(
+                    `✓ 分片下载完成：${buffer.byteLength} bytes`,
+                    "ok"
+                );
+
+
+                /*
+                 * 目前直接把返回的二进制交给 hls.js。
+                 */
 
                 callbacks.onSuccess(
 
@@ -1252,11 +1666,6 @@ class CustomTSLoader {
                 );
 
 
-                failedSegments++;
-
-                updateStats();
-
-
                 callbacks.onError(
 
                     {
@@ -1274,6 +1683,7 @@ class CustomTSLoader {
                     null,
 
                     this.stats
+
                 );
             }
         );
@@ -1281,6 +1691,46 @@ class CustomTSLoader {
 
 
     abort() {
+
+        this.aborted =
+            true;
+
+
+        if (
+            this.stats
+        ) {
+
+            this.stats.aborted =
+                true;
+        }
+
+
+        if (
+            this.controller
+        ) {
+
+            try {
+
+                this.controller.abort();
+
+            } catch(e) {}
+        }
+
+
+        if (
+            this.loader
+        ) {
+
+            try {
+
+                this.loader.abort();
+
+            } catch(e) {}
+        }
+    }
+
+
+    destroy() {
 
         this.aborted =
             true;
@@ -1296,14 +1746,27 @@ class CustomTSLoader {
 
             } catch(e) {}
         }
-    }
 
 
-    destroy() {
+        if (
+            this.loader
+        ) {
 
-        this.abort();
+            try {
+
+                this.loader.destroy();
+
+            } catch(e) {}
+        }
+
+
+        this.loader =
+            null;
 
         this.controller =
+            null;
+
+        this.stats =
             null;
     }
 }
@@ -1343,25 +1806,13 @@ function createVirtualM3U8() {
 
 
 /* =========================================================
-   创建 Blob M3U8
+   Blob M3U8
 ========================================================= */
 
 function createM3U8Blob() {
 
     const text =
         createVirtualM3U8();
-
-
-    log(
-        "虚拟 M3U8 内容：",
-        "dim"
-    );
-
-
-    log(
-        text,
-        "dim"
-    );
 
 
     const blob =
@@ -1401,7 +1852,7 @@ function createM3U8Blob() {
 
 
 /* =========================================================
-   阿里云 URL
+   阿里云
 ========================================================= */
 
 function getAliyunURL(source) {
@@ -1413,20 +1864,15 @@ function getAliyunURL(source) {
 }
 
 
-/* =========================================================
-   阿里云播放器
-========================================================= */
-
 function openAliyunPlayer() {
 
-    const input =
-        document.getElementById(
-            "m3u8Input"
-        );
-
-
     const url =
-        input.value.trim();
+        document
+            .getElementById(
+                "m3u8Input"
+            )
+            .value
+            .trim();
 
 
     if (!url) {
@@ -1479,7 +1925,23 @@ function openAliyunPlayer() {
     }
 
 
-    resetVideo();
+    const video =
+        document.getElementById(
+            "video"
+        );
+
+
+    try {
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+    } catch(e) {}
 
 
     iframe.src =
@@ -1511,9 +1973,10 @@ function openAliyunPlayer() {
    原生 H5
 ========================================================= */
 
-function startNativeH5(url) {
+function startNativeH5(url, generation) {
 
     return new Promise(
+
         (resolve, reject) => {
 
             const video =
@@ -1535,20 +1998,6 @@ function startNativeH5(url) {
             );
 
 
-            const canPlay =
-                video.canPlayType(
-                    "application/vnd.apple.mpegurl"
-                );
-
-
-            log(
-                `原生 HLS canPlayType：${
-                    canPlay || "不支持/未知"
-                }`,
-                "info"
-            );
-
-
             let settled =
                 false;
 
@@ -1556,7 +2005,9 @@ function startNativeH5(url) {
             function success() {
 
                 if (
-                    settled
+                    settled ||
+                    generation !==
+                    playGeneration
                 ) {
 
                     return;
@@ -1565,6 +2016,9 @@ function startNativeH5(url) {
 
                 settled =
                     true;
+
+
+                cleanup();
 
 
                 if (
@@ -1578,9 +2032,6 @@ function startNativeH5(url) {
                     fallbackTimer =
                         null;
                 }
-
-
-                cleanup();
 
 
                 log(
@@ -1612,6 +2063,9 @@ function startNativeH5(url) {
                     true;
 
 
+                cleanup();
+
+
                 if (
                     fallbackTimer
                 ) {
@@ -1625,13 +2079,8 @@ function startNativeH5(url) {
                 }
 
 
-                cleanup();
-
-
                 log(
-                    `原生 H5 播放失败：${
-                        reason || "未知错误"
-                    }`,
+                    `原生 H5 播放失败：${reason || "未知错误"}`,
                     "warn"
                 );
 
@@ -1738,6 +2187,7 @@ function startNativeH5(url) {
             ) {
 
                 playPromise.catch(
+
                     error => {
 
                         if (
@@ -1747,15 +2197,17 @@ function startNativeH5(url) {
                         ) {
 
                             log(
-                                "原生 H5：浏览器阻止自动播放，请点击播放",
+                                "原生 H5：浏览器阻止自动播放，请点击播放按钮",
                                 "warn"
                             );
+
 
                             setLoading(false);
 
                             setStatus(
                                 "请点击播放按钮"
                             );
+
 
                             return;
                         }
@@ -1771,17 +2223,15 @@ function startNativeH5(url) {
             }
 
 
-            /*
-             * 8 秒没有进入 playing
-             * 自动进入 hls.js
-             */
-
             fallbackTimer =
                 setTimeout(
+
                     () => {
 
                         if (
-                            !settled
+                            !settled &&
+                            generation ===
+                            playGeneration
                         ) {
 
                             failure(
@@ -1790,6 +2240,7 @@ function startNativeH5(url) {
                         }
 
                     },
+
                     8000
                 );
         }
@@ -1798,25 +2249,13 @@ function startNativeH5(url) {
 
 
 /* =========================================================
-   启动 hls.js
-   =========================================================
-   
-   重要：
-
-   这里已经删除：
-
-       video.canPlayType()
-
-   因为进入这个函数就意味着：
-
-       原生 H5 已经失败
-
-   此处必须强制：
-
-       hls.js + MSE
+   hls.js
 ========================================================= */
 
-function startHLS(blobURL) {
+function startHLS(
+    blobURL,
+    generation
+) {
 
     const video =
         document.getElementById(
@@ -1831,7 +2270,9 @@ function startHLS(blobURL) {
     hideAliyunPlayer();
 
 
-    if (!window.Hls) {
+    if (
+        !window.Hls
+    ) {
 
         throw new Error(
             "hls.js 加载失败"
@@ -1839,7 +2280,9 @@ function startHLS(blobURL) {
     }
 
 
-    if (!Hls.isSupported()) {
+    if (
+        !Hls.isSupported()
+    ) {
 
         throw new Error(
             "当前浏览器不支持 MSE"
@@ -1853,30 +2296,17 @@ function startHLS(blobURL) {
     );
 
 
-    log(
-        "✓ 强制使用 hls.js + MSE",
-        "ok"
-    );
-
-
     /*
-     * 销毁旧 HLS
-     */
-
-    if (hls) {
-
-        try {
-
-            hls.destroy();
-
-        } catch(e) {}
-
-        hls = null;
-    }
-
-
-    /*
-     * hls.js 配置
+     * =====================================================
+     * 关键配置
+     *
+     * loader = CustomTSLoader
+     *
+     * 但是 CustomTSLoader 内部：
+     *
+     * manifest → DefaultLoader
+     * fragment → fetch
+     * =====================================================
      */
 
     const config = {
@@ -1914,12 +2344,10 @@ function startHLS(blobURL) {
 
 
     hls =
-        new Hls(config);
+        new Hls(
+            config
+        );
 
-
-    /*
-     * Video Attached
-     */
 
     hls.on(
 
@@ -1927,15 +2355,18 @@ function startHLS(blobURL) {
 
         () => {
 
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
+
             log(
                 "✓ Video 已连接到 hls.js",
                 "ok"
-            );
-
-
-            log(
-                "正在加载虚拟 M3U8...",
-                "info"
             );
 
 
@@ -1945,10 +2376,6 @@ function startHLS(blobURL) {
         }
     );
 
-
-    /*
-     * Manifest Loading
-     */
 
     hls.on(
 
@@ -1964,15 +2391,14 @@ function startHLS(blobURL) {
     );
 
 
-    /*
-     * Manifest Loaded
-     */
-
     hls.on(
 
         Hls.Events.MANIFEST_LOADED,
 
-        () => {
+        (
+            event,
+            data
+        ) => {
 
             log(
                 "✓ 虚拟 M3U8 加载完成",
@@ -1981,10 +2407,6 @@ function startHLS(blobURL) {
         }
     );
 
-
-    /*
-     * Manifest Parsed
-     */
 
     hls.on(
 
@@ -1995,6 +2417,15 @@ function startHLS(blobURL) {
             data
         ) => {
 
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
+
             log(
                 `✓ M3U8 解析成功：${data.levels.length} 个 Level`,
                 "ok"
@@ -2003,9 +2434,8 @@ function startHLS(blobURL) {
 
             setLoading(false);
 
-
             setStatus(
-                "hls.js M3U8 已加载"
+                "M3U8 已加载"
             );
 
 
@@ -2016,46 +2446,25 @@ function startHLS(blobURL) {
                     () => {
 
                         log(
-                            "✓ hls.js 自动播放成功",
+                            "✓ 自动播放成功",
                             "ok"
                         );
-
                     }
 
                 )
 
                 .catch(
 
-                    error => {
-
-                        if (
-                            error &&
-                            error.name ===
-                            "NotAllowedError"
-                        ) {
-
-                            log(
-                                "浏览器阻止自动播放，请点击播放",
-                                "warn"
-                            );
-
-                            setStatus(
-                                "请点击播放"
-                            );
-
-                            setLoading(false);
-
-                            return;
-                        }
-
+                    () => {
 
                         log(
-                            `hls.js play() 失败：${
-                                error
-                                    ? error.message
-                                    : "未知错误"
-                            }`,
+                            "浏览器阻止自动播放，请点击播放",
                             "warn"
+                        );
+
+
+                        setStatus(
+                            "请点击播放按钮"
                         );
                     }
                 );
@@ -2064,7 +2473,7 @@ function startHLS(blobURL) {
 
 
     /*
-     * Fragment Loading
+     * 分片开始
      */
 
     hls.on(
@@ -2075,6 +2484,15 @@ function startHLS(blobURL) {
             event,
             data
         ) => {
+
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
 
             currentSegment =
                 Number(data.frag.sn) + 1;
@@ -2100,7 +2518,7 @@ function startHLS(blobURL) {
 
 
     /*
-     * Fragment Loaded
+     * 分片完成
      */
 
     hls.on(
@@ -2111,6 +2529,15 @@ function startHLS(blobURL) {
             event,
             data
         ) => {
+
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
 
             successfulSegments++;
 
@@ -2125,35 +2552,14 @@ function startHLS(blobURL) {
 
 
             setStatus(
-                `已加载 ${successfulSegments}/${segments.length} 片`
+                `已加载 ${successfulSegments} 片`
             );
         }
     );
 
 
     /*
-     * Fragment Parsed
-     */
-
-    hls.on(
-
-        Hls.Events.FRAG_PARSED,
-
-        (
-            event,
-            data
-        ) => {
-
-            log(
-                `✓ 第 ${Number(data.frag.sn) + 1} 片解析完成`,
-                "ok"
-            );
-        }
-    );
-
-
-    /*
-     * HLS Error
+     * HLS 错误
      */
 
     hls.on(
@@ -2165,17 +2571,24 @@ function startHLS(blobURL) {
             data
         ) => {
 
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
+
             log(
+
                 `HLS：${data.type} / ${data.details}`,
+
                 data.fatal
                     ? "error"
                     : "warn"
             );
 
-
-            /*
-             * 非致命错误
-             */
 
             if (
                 !data.fatal
@@ -2204,15 +2617,20 @@ function startHLS(blobURL) {
 
                     hls.startLoad();
 
-                    return;
-
                 } catch(e) {
 
                     log(
-                        `HLS 网络恢复失败：${e.message}`,
+                        "恢复失败：" +
+                        e.message,
                         "error"
                     );
+
+
+                    fallbackToAliyun();
                 }
+
+
+                return;
             }
 
 
@@ -2235,15 +2653,20 @@ function startHLS(blobURL) {
 
                     hls.recoverMediaError();
 
-                    return;
-
                 } catch(e) {
 
                     log(
-                        `媒体恢复失败：${e.message}`,
+                        "媒体恢复失败：" +
+                        e.message,
                         "error"
                     );
+
+
+                    fallbackToAliyun();
                 }
+
+
+                return;
             }
 
 
@@ -2252,31 +2675,20 @@ function startHLS(blobURL) {
              */
 
             log(
-                "❌ hls.js 无法继续播放",
+                "❌ HLS 无法继续播放",
                 "error"
             );
 
 
             setLoading(false);
 
-
             setStatus(
-                "hls.js 播放失败"
+                "HLS 播放失败"
             );
 
 
             fallbackToAliyun();
         }
-    );
-
-
-    /*
-     * attach
-     */
-
-    log(
-        "正在 attachMedia...",
-        "info"
     );
 
 
@@ -2287,7 +2699,7 @@ function startHLS(blobURL) {
 
 
 /* =========================================================
-   HLS fallback
+   原生 H5 → hls.js
 ========================================================= */
 
 function fallbackToHLS() {
@@ -2300,21 +2712,17 @@ function fallbackToHLS() {
     }
 
 
-    fallbackStarted =
-        true;
-
-
     if (
-        fallbackTimer
+        playerMode ===
+        "aliyun"
     ) {
 
-        clearTimeout(
-            fallbackTimer
-        );
-
-        fallbackTimer =
-            null;
+        return;
     }
+
+
+    fallbackStarted =
+        true;
 
 
     log(
@@ -2324,7 +2732,7 @@ function fallbackToHLS() {
 
 
     log(
-        "③ 切换到 hls.js + MSE + CustomTSLoader",
+        "③ 切换到 hls.js + CustomTSLoader",
         "info"
     );
 
@@ -2340,17 +2748,6 @@ function fallbackToHLS() {
     );
 
 
-    /*
-     * 停止原生 video
-     */
-
-    resetVideo();
-
-
-    /*
-     * 创建虚拟 M3U8
-     */
-
     const virtualURL =
         createM3U8Blob();
 
@@ -2362,15 +2759,20 @@ function fallbackToHLS() {
 
 
     log(
-        "开始通过 hls.js 边下载边播放",
+        "开始边下载边播放",
         "ok"
     );
+
+
+    const generation =
+        playGeneration;
 
 
     try {
 
         startHLS(
-            virtualURL
+            virtualURL,
+            generation
         );
 
     } catch(error) {
@@ -2387,7 +2789,7 @@ function fallbackToHLS() {
 
 
 /* =========================================================
-   最终 fallback 到阿里云
+   hls.js → 阿里云
 ========================================================= */
 
 function fallbackToAliyun() {
@@ -2398,6 +2800,16 @@ function fallbackToAliyun() {
     ) {
 
         return;
+    }
+
+
+    if (
+        fallbackStarted ===
+        false
+    ) {
+
+        fallbackStarted =
+            true;
     }
 
 
@@ -2420,11 +2832,19 @@ function fallbackToAliyun() {
 
 
     setTimeout(
+
         () => {
 
-            openAliyunPlayer();
+            if (
+                originalM3U8URL
+            ) {
+
+                openAliyunPlayer();
+
+            }
 
         },
+
         300
     );
 }
@@ -2436,18 +2856,100 @@ function fallbackToAliyun() {
 
 async function startPlayer() {
 
-    stopPlayer();
+    /*
+     * 不使用 stopPlayer()
+     * 避免多产生一次停止日志
+     */
+
+    playGeneration++;
 
 
-    segments = [];
+    const generation =
+        playGeneration;
 
-    successfulSegments = 0;
 
-    failedSegments = 0;
+    fallbackStarted =
+        false;
 
-    currentSegment = 0;
 
-    fallbackStarted = false;
+    if (
+        fallbackTimer
+    ) {
+
+        clearTimeout(
+            fallbackTimer
+        );
+
+        fallbackTimer =
+            null;
+    }
+
+
+    if (hls) {
+
+        try {
+
+            hls.destroy();
+
+        } catch(e) {}
+
+        hls =
+            null;
+    }
+
+
+    const video =
+        document.getElementById(
+            "video"
+        );
+
+
+    try {
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+    } catch(e) {}
+
+
+    hideAliyunPlayer();
+
+
+    if (currentObjectURL) {
+
+        try {
+
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+
+        } catch(e) {}
+
+        currentObjectURL =
+            null;
+    }
+
+
+    segments =
+        [];
+
+    successfulSegments =
+        0;
+
+    failedSegments =
+        0;
+
+    currentSegment =
+        0;
+
+
+    playerMode =
+        "";
 
 
     updateStats();
@@ -2510,7 +3012,9 @@ async function startPlayer() {
 
 
         /*
-         * 读取 M3U8
+         * =====================================================
+         * 读取原始 M3U8
+         * =====================================================
          */
 
         const text =
@@ -2519,9 +3023,14 @@ async function startPlayer() {
             );
 
 
-        /*
-         * 解析
-         */
+        if (
+            generation !==
+            playGeneration
+        ) {
+
+            return;
+        }
+
 
         parseM3U8(
             text
@@ -2545,14 +3054,28 @@ async function startPlayer() {
 
 
         /*
-         * 原生 H5
+         * =====================================================
+         * 第一阶段
+         *
+         * 原始 M3U8 → 原生 H5
+         * =====================================================
          */
 
         try {
 
             await startNativeH5(
-                url
+                url,
+                generation
             );
+
+
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
 
 
             setLoading(false);
@@ -2560,6 +3083,15 @@ async function startPlayer() {
             return;
 
         } catch(nativeError) {
+
+            if (
+                generation !==
+                playGeneration
+            ) {
+
+                return;
+            }
+
 
             log(
                 `原生 H5 失败：${nativeError.message}`,
@@ -2569,12 +3101,35 @@ async function startPlayer() {
 
 
         /*
-         * hls.js
+         * =====================================================
+         * 第二阶段
+         *
+         * 虚拟 M3U8 → hls.js
+         * =====================================================
          */
+
+        if (
+            generation !==
+            playGeneration
+        ) {
+
+            return;
+        }
+
 
         fallbackToHLS();
 
+
     } catch(error) {
+
+        if (
+            generation !==
+            playGeneration
+        ) {
+
+            return;
+        }
+
 
         console.error(
             error
@@ -2589,16 +3144,10 @@ async function startPlayer() {
 
         setLoading(false);
 
-
         setStatus(
-            "播放启动失败"
+            "播放失败"
         );
 
-
-        /*
-         * M3U8 本身无法解析
-         * 直接进入阿里云
-         */
 
         log(
             "尝试使用阿里云原生 H5 诊断...",
@@ -2606,14 +3155,7 @@ async function startPlayer() {
         );
 
 
-        setTimeout(
-            () => {
-
-                openAliyunPlayer();
-
-            },
-            300
-        );
+        fallbackToAliyun();
     }
 }
 
@@ -2627,10 +3169,6 @@ const video =
         "video"
     );
 
-
-/*
- * 播放开始
- */
 
 video.addEventListener(
 
@@ -2669,15 +3207,20 @@ video.addEventListener(
 );
 
 
-/*
- * 等待数据
- */
-
 video.addEventListener(
 
     "waiting",
 
     () => {
+
+        if (
+            playerMode ===
+            "aliyun"
+        ) {
+
+            return;
+        }
+
 
         setLoading(
             true,
@@ -2692,50 +3235,35 @@ video.addEventListener(
 );
 
 
-/*
- * 可以播放
- */
-
 video.addEventListener(
 
     "canplay",
 
     () => {
 
-        /*
-         * 不要在 hls.js 模式下
-         * 因为 canplay 就改变状态太多。
-         */
-
         if (
             playerMode ===
-            "native"
+            "aliyun"
         ) {
 
-            setLoading(false);
-
-            setStatus(
-                "原生 H5 可以播放"
-            );
-
-        } else if (
-            playerMode ===
-            "hls"
-        ) {
-
-            setLoading(false);
-
-            setStatus(
-                "hls.js 可以播放"
-            );
+            return;
         }
+
+
+        setLoading(false);
+
+
+        setStatus(
+
+            playerMode === "hls"
+
+                ? "hls.js 可以播放"
+
+                : "原生 H5 可以播放"
+        );
     }
 );
 
-
-/*
- * 播放结束
- */
 
 video.addEventListener(
 
@@ -2749,6 +3277,7 @@ video.addEventListener(
             "播放结束"
         );
 
+
         log(
             "播放结束",
             "ok"
@@ -2756,10 +3285,6 @@ video.addEventListener(
     }
 );
 
-
-/*
- * Video error
- */
 
 video.addEventListener(
 
@@ -2783,19 +3308,13 @@ video.addEventListener(
 
 
         /*
-         * 原生 H5 阶段
+         * 原生 H5
          */
 
         if (
             playerMode ===
             "native"
         ) {
-
-            log(
-                "原生 H5 Video error，进入 hls.js",
-                "warn"
-            );
-
 
             fallbackToHLS();
 
@@ -2804,11 +3323,10 @@ video.addEventListener(
 
 
         /*
-         * hls.js 阶段
+         * hls.js
          *
-         * 不直接 fallback。
-         *
-         * 交给 hls.js ERROR 事件判断。
+         * 不直接 fallback，
+         * 交给 hls.js ERROR 判断 fatal。
          */
 
         if (
@@ -2826,7 +3344,7 @@ video.addEventListener(
 
 
 /* =========================================================
-   页面初始化
+   初始化
 ========================================================= */
 
 log(
@@ -2836,7 +3354,7 @@ log(
 
 
 log(
-    "工作模式：原生 H5 → hls.js + MSE → 阿里云",
+    "工作模式：原生 H5 → hls.js → 阿里云原生 H5",
     "info"
 );
 
@@ -2848,7 +3366,7 @@ log(
 
 
 log(
-    "hls.js fallback：强制使用 MSE，不再走原生 HLS",
+    "CustomTSLoader：Manifest 使用默认 Loader，Fragment 使用自定义 Loader",
     "ok"
 );
 
