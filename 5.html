@@ -7,14 +7,25 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-<title>PNG 伪装 TS · HLS 播放器</title>
+<title>PNG 伪装 TS · HLS / Chrome MP4 / 阿里云 H5</title>
+
 
 <!-- =========================================================
-     hls.js
-     保持原来的 CDN，不修改
+     你的 hls.js
+     不修改
 ========================================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+
+<!-- =========================================================
+     Chrome 专用：
+     MPEG-TS → fMP4
+     
+     hls.js 不动。
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/mux.js@7.1.0/dist/mux.min.js"></script>
 
 
 <style>
@@ -25,6 +36,7 @@
 
 html,
 body {
+
     margin: 0;
     padding: 0;
 
@@ -66,8 +78,7 @@ body {
             #0e121b
         );
 
-    border:
-        1px solid #252c3a;
+    border: 1px solid #252c3a;
 
     box-shadow:
         0 15px 45px rgba(0,0,0,.35);
@@ -77,43 +88,33 @@ body {
 
 .header h1 {
 
-    margin:
-        0 0 8px;
+    margin: 0 0 8px;
 
-    font-size:
-        25px;
+    font-size: 25px;
 }
 
 .header p {
 
     margin: 0;
 
-    color:
-        #929bad;
+    color: #929bad;
 
-    font-size:
-        14px;
+    font-size: 14px;
 
-    line-height:
-        1.7;
+    line-height: 1.7;
 }
 
 .card {
 
-    background:
-        #111620;
+    background: #111620;
 
-    border:
-        1px solid #252c3a;
+    border: 1px solid #252c3a;
 
-    border-radius:
-        22px;
+    border-radius: 22px;
 
-    padding:
-        20px;
+    padding: 20px;
 
-    margin-bottom:
-        18px;
+    margin-bottom: 18px;
 
     box-shadow:
         0 12px 40px rgba(0,0,0,.25);
@@ -123,203 +124,160 @@ label {
 
     display: block;
 
-    margin-bottom:
-        8px;
+    margin-bottom: 8px;
 
-    color:
-        #aeb7c8;
+    color: #aeb7c8;
 
-    font-size:
-        14px;
+    font-size: 14px;
 }
 
 input {
 
     width: 100%;
 
-    height:
-        48px;
+    height: 48px;
 
-    padding:
-        0 15px;
+    padding: 0 15px;
 
-    border-radius:
-        13px;
+    border-radius: 13px;
 
-    border:
-        1px solid #303848;
+    border: 1px solid #303848;
 
     outline: none;
 
-    background:
-        #090c12;
+    background: #090c12;
 
-    color:
-        #fff;
+    color: #fff;
 
-    font-size:
-        14px;
+    font-size: 14px;
 }
 
 input:focus {
 
-    border-color:
-        #6b8cff;
+    border-color: #6b8cff;
 }
 
 .buttons {
 
-    display:
-        flex;
+    display: flex;
 
-    gap:
-        10px;
+    gap: 10px;
 
-    margin-top:
-        14px;
+    margin-top: 14px;
 
-    flex-wrap:
-        wrap;
+    flex-wrap: wrap;
 }
 
 button {
 
     border: 0;
 
-    border-radius:
-        13px;
+    border-radius: 13px;
 
-    padding:
-        13px 20px;
+    padding: 13px 20px;
 
-    background:
-        #2a3243;
+    background: #2a3243;
 
-    color:
-        #fff;
+    color: #fff;
 
-    font-size:
-        15px;
+    font-size: 15px;
 
-    cursor:
-        pointer;
+    cursor: pointer;
 }
 
 button.primary {
 
-    background:
-        #596fff;
+    background: #596fff;
 }
 
 button.danger {
 
-    background:
-        #8f3343;
+    background: #8f3343;
+}
+
+button.aliyun {
+
+    background: #1677ff;
 }
 
 button:disabled {
 
-    opacity:
-        .45;
+    opacity: .45;
 
-    cursor:
-        not-allowed;
+    cursor: not-allowed;
 }
-
-
-/* =========================================================
-   播放器区域
-========================================================= */
 
 .video-box {
 
-    position:
-        relative;
+    position: relative;
 
-    width:
-        100%;
+    width: 100%;
 
-    aspect-ratio:
-        16 / 9;
+    aspect-ratio: 16 / 9;
 
-    background:
-        #000;
+    background: #000;
 
-    border-radius:
-        18px;
+    border-radius: 18px;
 
-    overflow:
-        hidden;
+    overflow: hidden;
 }
 
 video {
 
-    width:
-        100%;
+    width: 100%;
 
-    height:
-        100%;
+    height: 100%;
 
-    display:
-        block;
+    display: block;
 
-    background:
-        #000;
+    background: #000;
 }
 
 
 /* =========================================================
-   阿里云诊断 iframe
+   阿里云 H5 iframe
 ========================================================= */
 
-.aliyun-player {
+.aliyun-frame {
 
-    position:
-        absolute;
+    position: absolute;
 
-    inset:
-        0;
+    inset: 0;
 
-    width:
-        100%;
+    width: 100%;
 
-    height:
-        100%;
+    height: 100%;
 
-    border:
-        0;
+    border: 0;
 
-    background:
-        #000;
+    background: #000;
 
-    display:
-        none;
+    display: none;
+}
+
+.aliyun-frame.show {
+
+    display: block;
 }
 
 
 /* =========================================================
-   加载
+   Loading
 ========================================================= */
 
 .loading {
 
-    position:
-        absolute;
+    position: absolute;
 
-    inset:
-        0;
+    inset: 0;
 
-    display:
-        flex;
+    display: flex;
 
-    align-items:
-        center;
+    align-items: center;
 
-    justify-content:
-        center;
+    justify-content: center;
 
-    flex-direction:
-        column;
+    flex-direction: column;
 
     background:
         rgba(0,0,0,.55);
@@ -327,61 +285,49 @@ video {
     backdrop-filter:
         blur(5px);
 
-    pointer-events:
-        none;
+    pointer-events: none;
 
-    opacity:
-        0;
+    opacity: 0;
 
-    transition:
-        .25s;
+    transition: .25s;
 
-    z-index:
-        20;
+    z-index: 10;
 }
 
 .loading.show {
 
-    opacity:
-        1;
+    opacity: 1;
 }
 
 .spinner {
 
-    width:
-        54px;
+    width: 54px;
 
-    height:
-        54px;
+    height: 54px;
 
-    border-radius:
-        50%;
+    border-radius: 50%;
 
     border:
         5px solid rgba(255,255,255,.18);
 
-    border-top-color:
-        #fff;
+    border-top-color: #fff;
 
     animation:
         spin .8s linear infinite;
 
-    margin-bottom:
-        14px;
+    margin-bottom: 14px;
 }
 
 @keyframes spin {
 
     to {
-        transform:
-            rotate(360deg);
+        transform: rotate(360deg);
     }
 }
 
 .loading-text {
 
-    font-size:
-        16px;
+    font-size: 16px;
 }
 
 
@@ -391,80 +337,61 @@ video {
 
 .stats {
 
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap:
-        10px;
+    gap: 10px;
 
-    margin-top:
-        15px;
+    margin-top: 15px;
 }
 
 .stat {
 
-    background:
-        #090c12;
+    background: #090c12;
 
-    border-radius:
-        15px;
+    border-radius: 15px;
 
-    padding:
-        15px;
+    padding: 15px;
 }
 
 .stat-title {
 
-    color:
-        #818a9c;
+    color: #818a9c;
 
-    font-size:
-        13px;
+    font-size: 13px;
 
-    margin-bottom:
-        8px;
+    margin-bottom: 8px;
 }
 
 .stat-value {
 
-    font-size:
-        22px;
+    font-size: 22px;
 
-    font-weight:
-        600;
+    font-weight: 600;
 }
 
 .progress {
 
-    height:
-        8px;
+    height: 8px;
 
-    background:
-        #292f3c;
+    background: #292f3c;
 
-    border-radius:
-        99px;
+    border-radius: 99px;
 
-    overflow:
-        hidden;
+    overflow: hidden;
 
-    margin-top:
-        15px;
+    margin-top: 15px;
 }
 
 .progress-bar {
 
-    height:
-        100%;
+    height: 100%;
 
-    width:
-        0%;
+    width: 0%;
 
-    background:
-        #6578ff;
+    background: #6578ff;
 
     transition:
         width .2s;
@@ -472,26 +399,34 @@ video {
 
 .status {
 
-    margin-top:
-        12px;
+    margin-top: 12px;
 
-    display:
-        inline-block;
+    display: inline-block;
 
-    padding:
-        8px 13px;
+    padding: 8px 13px;
 
-    border-radius:
-        99px;
+    border-radius: 99px;
 
-    background:
-        #20283a;
+    background: #20283a;
 
-    color:
-        #b9c3d7;
+    color: #b9c3d7;
 
-    font-size:
-        13px;
+    font-size: 13px;
+}
+
+.mode {
+
+    margin-top: 10px;
+
+    padding: 10px 13px;
+
+    border-radius: 12px;
+
+    background: #151b27;
+
+    color: #9eabc0;
+
+    font-size: 13px;
 }
 
 
@@ -501,160 +436,119 @@ video {
 
 .log-title {
 
-    display:
-        flex;
+    display: flex;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
-    align-items:
-        center;
+    align-items: center;
 
-    margin-bottom:
-        12px;
+    margin-bottom: 12px;
 }
 
 .log-title h2 {
 
-    margin:
-        0;
+    margin: 0;
 
-    font-size:
-        20px;
+    font-size: 20px;
 }
 
 .badge {
 
-    padding:
-        7px 12px;
+    padding: 7px 12px;
 
-    border-radius:
-        99px;
+    border-radius: 99px;
 
-    background:
-        #222a3b;
+    background: #222a3b;
 
-    color:
-        #b8c2d6;
+    color: #b8c2d6;
 
-    font-size:
-        13px;
+    font-size: 13px;
 }
 
 .log {
 
-    height:
-        400px;
+    height: 400px;
 
-    overflow-y:
-        auto;
+    overflow-y: auto;
 
-    padding:
-        17px;
+    padding: 17px;
 
-    background:
-        #05070b;
+    background: #05070b;
 
-    border-radius:
-        16px;
+    border-radius: 16px;
 
     font-family:
         "Consolas",
         "Courier New",
         monospace;
 
-    font-size:
-        13px;
+    font-size: 13px;
 
-    line-height:
-        1.9;
+    line-height: 1.9;
 
-    white-space:
-        pre-wrap;
+    white-space: pre-wrap;
 
-    word-break:
-        break-word;
+    word-break: break-word;
 }
 
 .log-line {
 
-    margin-bottom:
-        3px;
+    margin-bottom: 3px;
 }
 
 .log-info {
 
-    color:
-        #91d9ff;
+    color: #91d9ff;
 }
 
 .log-ok {
 
-    color:
-        #79e3a3;
+    color: #79e3a3;
 }
 
 .log-warn {
 
-    color:
-        #ffd479;
+    color: #ffd479;
 }
 
 .log-error {
 
-    color:
-        #ff7886;
+    color: #ff7886;
 }
 
 .log-url {
 
-    color:
-        #c6b8ff;
+    color: #c6b8ff;
 }
 
 .log-dim {
 
-    color:
-        #788397;
+    color: #788397;
 }
 
 .clear {
 
-    width:
-        100%;
+    width: 100%;
 
-    margin-top:
-        12px;
+    margin-top: 12px;
 }
 
 .notice {
 
-    margin-top:
-        13px;
+    margin-top: 13px;
 
-    padding:
-        13px 15px;
+    padding: 13px 15px;
 
-    border-radius:
-        13px;
+    border-radius: 13px;
 
-    background:
-        #171d2a;
+    background: #171d2a;
 
-    color:
-        #aeb8c9;
+    color: #aeb8c9;
 
-    font-size:
-        13px;
+    font-size: 13px;
 
-    line-height:
-        1.7;
+    line-height: 1.7;
 }
-
-
-/* =========================================================
-   手机
-========================================================= */
 
 @media(max-width:650px) {
 
@@ -663,32 +557,26 @@ video {
         width:
             calc(100% - 16px);
 
-        margin-top:
-            10px;
+        margin-top: 10px;
     }
 
     .card {
 
-        padding:
-            14px;
+        padding: 14px;
 
-        border-radius:
-            18px;
+        border-radius: 18px;
     }
 
     .header {
 
-        padding:
-            17px;
+        padding: 17px;
 
-        border-radius:
-            18px;
+        border-radius: 18px;
     }
 
     .header h1 {
 
-        font-size:
-            21px;
+        font-size: 21px;
     }
 
     .stats {
@@ -699,21 +587,17 @@ video {
 
     .log {
 
-        height:
-            420px;
+        height: 420px;
 
-        font-size:
-            12px;
+        font-size: 12px;
     }
 }
 
 </style>
-
 </head>
 
 
 <body>
-
 
 <div class="container">
 
@@ -729,7 +613,10 @@ video {
     </h1>
 
     <p>
-        原生 H5 → hls.js → 阿里云原生 H5 诊断播放器
+        M3U8 → 过滤前 5 行 →
+        EXTINF/媒体地址 →
+        PNG 二进制 →
+        HLS / Chrome MP4 / 阿里云 H5
     </p>
 
 </div>
@@ -745,15 +632,20 @@ video {
         M3U8 地址
     </label>
 
+    <!--
+        按你的要求：
+        不再放固定 URL
+    -->
+
     <input
         id="m3u8Input"
         type="text"
         placeholder="请输入 M3U8 地址"
         value=""
         autocomplete="off"
-        autocapitalize="off"
         spellcheck="false"
     >
+
 
     <div class="buttons">
 
@@ -776,9 +668,10 @@ video {
 
 
         <button
-            onclick="openAliyunPlayer()">
+            class="aliyun"
+            onclick="manualAliyun()">
 
-            阿里云 H5
+            ▶ 阿里云 H5
 
         </button>
 
@@ -789,24 +682,52 @@ video {
 
         当前解析规则：
 
-        <b>过滤 M3U8 前 5 行</b>，
-
-        从第 6 行开始读取
-
-        <b>EXTINF + 下一行媒体地址</b>，
-
-        遇到
-
-        <b>#EXT-X-ENDLIST</b>
-
-        停止。
+        <b>
+            过滤 M3U8 前 5 行
+        </b>
 
         <br>
 
-        播放顺序：
+        从第 6 行开始，
+
+        每组读取：
 
         <b>
-            原生 H5 → hls.js → 阿里云播放器诊断页
+            EXTINF + 下一行媒体地址
+        </b>
+
+        <br>
+
+        遇到：
+
+        <b>
+            #EXT-X-ENDLIST
+        </b>
+
+        停止解析。
+
+        <br><br>
+
+        Chrome 浏览器：
+
+        <b>
+            PNG/TS → fMP4 → MediaSource → video/mp4
+        </b>
+
+        <br>
+
+        其他浏览器：
+
+        <b>
+            使用原来的 hls.js
+        </b>
+
+        <br>
+
+        播放失败：
+
+        <b>
+            自动切换阿里云 H5
         </b>
 
     </div>
@@ -831,16 +752,13 @@ video {
 
 
         <!--
-
-            阿里云播放器诊断页面
-
-            仅在前面的播放器失败以后显示
-
+            阿里云 H5
+            默认隐藏
         -->
 
         <iframe
-            id="aliyunPlayer"
-            class="aliyun-player"
+            id="aliyunFrame"
+            class="aliyun-frame"
             allow="autoplay; fullscreen"
             allowfullscreen>
         </iframe>
@@ -864,6 +782,10 @@ video {
 
     </div>
 
+
+    <!-- =====================================================
+         统计
+    ====================================================== -->
 
     <div class="stats">
 
@@ -946,6 +868,15 @@ video {
     </div>
 
 
+    <div
+        id="mode"
+        class="mode">
+
+        播放模式：等待检测
+
+    </div>
+
+
     <div class="progress">
 
         <div
@@ -971,7 +902,7 @@ video {
         </h2>
 
         <div class="badge">
-            H5 → hls.js → Aliyun
+            HLS / MP4 / Aliyun H5
         </div>
 
     </div>
@@ -999,7 +930,6 @@ video {
 
 <script>
 
-
 /* =========================================================
    全局变量
 ========================================================= */
@@ -1020,37 +950,54 @@ let currentSegment = 0;
 
 
 /*
-   当前原始 M3U8
-
-   阿里云播放器需要使用原始地址
+    当前 M3U8 地址
 */
 
-let originalM3U8URL = "";
+let currentM3U8URL = "";
 
 
 /*
-   播放阶段
-
-   native
-   hls
-   aliyun
+    Chrome
 */
 
-let playerMode = "";
+let isChromeBrowser = false;
 
 
 /*
-   是否已经进行过 fallback
+    Chrome MP4 模式
 */
 
-let fallbackStarted = false;
+let chromeMP4Mode = false;
 
 
 /*
-   防止重复 fallback
+    防止重复切换阿里云
 */
 
-let fallbackTimer = null;
+let aliyunFallbackStarted = false;
+
+
+/*
+    Chrome MP4 播放相关
+*/
+
+let chromeTransmuxer = null;
+
+let chromeSourceBuffer = null;
+
+let chromeMediaSource = null;
+
+let chromeObjectURL = null;
+
+let chromeQueue = [];
+
+let chromeAppending = false;
+
+let chromeIndex = 0;
+
+let chromeInitAdded = false;
+
+let chromePlaying = false;
 
 
 /* =========================================================
@@ -1116,8 +1063,15 @@ function setLoading(show, text) {
 function setStatus(text) {
 
     document.getElementById("status")
+        .textContent = text;
+}
+
+
+function setMode(text) {
+
+    document.getElementById("mode")
         .textContent =
-        text;
+        "播放模式：" + text;
 }
 
 
@@ -1140,12 +1094,12 @@ function updateStats() {
         currentSegment || "-";
 
 
-    let done =
+    const done =
         successfulSegments +
         failedSegments;
 
 
-    let percent =
+    const percent =
         segments.length
             ? done / segments.length * 100
             : 0;
@@ -1159,21 +1113,152 @@ function updateStats() {
 
 
 /* =========================================================
-   隐藏阿里云 iframe
+   Chrome 检测
 ========================================================= */
 
-function hideAliyunPlayer() {
+function detectChrome() {
 
-    const iframe =
-        document.getElementById(
-            "aliyunPlayer"
+    const ua =
+        navigator.userAgent;
+
+
+    const isChromium =
+        /Chrome|CriOS/i.test(ua);
+
+
+    const isEdge =
+        /Edg/i.test(ua);
+
+
+    const isOpera =
+        /OPR/i.test(ua);
+
+
+    const isFirefox =
+        /Firefox|FxiOS/i.test(ua);
+
+
+    const isSafari =
+        /Safari/i.test(ua) &&
+        !/Chrome|CriOS/i.test(ua);
+
+
+    isChromeBrowser =
+        isChromium &&
+        !isEdge &&
+        !isOpera &&
+        !isFirefox &&
+        !isSafari;
+
+
+    chromeMP4Mode =
+        isChromeBrowser &&
+        typeof MediaSource !== "undefined";
+
+
+    if (chromeMP4Mode) {
+
+        log(
+            "✓ 检测到 Google Chrome",
+            "ok"
         );
 
-    iframe.style.display =
-        "none";
+        log(
+            "✓ MediaSource 可用",
+            "ok"
+        );
 
-    iframe.src =
-        "about:blank";
+        setMode(
+            "Google Chrome · TS → fMP4 → MediaSource"
+        );
+
+    } else {
+
+        log(
+            "当前不是 Chrome MP4 模式",
+            "info"
+        );
+
+        setMode(
+            "标准 HLS / hls.js"
+        );
+    }
+
+
+    return chromeMP4Mode;
+}
+
+
+/* =========================================================
+   停止 Chrome MP4
+========================================================= */
+
+function stopChromeMP4() {
+
+    chromeQueue = [];
+
+    chromeAppending = false;
+
+    chromeIndex = 0;
+
+    chromeInitAdded = false;
+
+    chromePlaying = false;
+
+
+    if (chromeTransmuxer) {
+
+        try {
+
+            chromeTransmuxer.off(
+                "data"
+            );
+
+        } catch(e) {}
+
+        chromeTransmuxer = null;
+    }
+
+
+    if (chromeSourceBuffer) {
+
+        try {
+
+            if (
+                chromeMediaSource &&
+                chromeMediaSource.readyState === "open"
+            ) {
+
+                if (
+                    chromeSourceBuffer.updating
+                ) {
+
+                    chromeSourceBuffer.abort();
+                }
+            }
+
+        } catch(e) {}
+    }
+
+
+    chromeSourceBuffer = null;
+
+
+    if (chromeObjectURL) {
+
+        try {
+
+            URL.revokeObjectURL(
+                chromeObjectURL
+            );
+
+        } catch(e) {}
+
+        chromeObjectURL = null;
+    }
+
+
+    chromeMediaSource = null;
 }
 
 
@@ -1181,19 +1266,16 @@ function hideAliyunPlayer() {
    停止
 ========================================================= */
 
-function stopPlayer() {
+function stopPlayer(
+    silent = false
+) {
 
-    fallbackStarted = false;
+    aliyunFallbackStarted = false;
 
-    if (fallbackTimer) {
 
-        clearTimeout(
-            fallbackTimer
-        );
-
-        fallbackTimer = null;
-    }
-
+    /*
+        停止 hls.js
+    */
 
     if (hls) {
 
@@ -1207,49 +1289,81 @@ function stopPlayer() {
     }
 
 
+    /*
+        停止 Chrome MP4
+    */
+
+    stopChromeMP4();
+
+
     const video =
-        document.getElementById(
-            "video"
-        );
+        document.getElementById("video");
 
 
     try {
 
         video.pause();
 
-        video.removeAttribute(
-            "src"
-        );
+        video.removeAttribute("src");
 
         video.load();
 
     } catch(e) {}
 
 
-    hideAliyunPlayer();
-
+    /*
+        Blob M3U8
+    */
 
     if (currentObjectURL) {
 
-        URL.revokeObjectURL(
-            currentObjectURL
-        );
+        try {
+
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+
+        } catch(e) {}
 
         currentObjectURL = null;
     }
+
+
+    /*
+        隐藏阿里云
+    */
+
+    const frame =
+        document.getElementById(
+            "aliyunFrame"
+        );
+
+    frame.classList.remove(
+        "show"
+    );
+
+    frame.src =
+        "about:blank";
+
+
+    video.style.display =
+        "block";
 
 
     setLoading(false);
 
     setStatus("已停止");
 
-    playerMode = "";
+    setMode("已停止");
 
 
-    log(
-        "播放器已停止",
-        "warn"
-    );
+    if (!silent) {
+
+        log(
+            "播放器已停止",
+            "warn"
+        );
+    }
 }
 
 
@@ -1270,6 +1384,7 @@ async function getM3U8(url) {
             url,
             {
                 method: "GET",
+
                 cache: "no-store"
             }
         );
@@ -1299,8 +1414,6 @@ async function getM3U8(url) {
 
 /* =========================================================
    解析 M3U8
-
-   这里保持原来的逻辑
 ========================================================= */
 
 function parseM3U8(text) {
@@ -1309,8 +1422,7 @@ function parseM3U8(text) {
         text
             .split(/\r?\n/)
             .map(
-                line =>
-                    line.trim()
+                line => line.trim()
             );
 
 
@@ -1324,9 +1436,7 @@ function parseM3U8(text) {
 
 
     /*
-       前5行过滤
-
-       从第6行开始
+        前5行过滤
     */
 
     let i = 5;
@@ -1341,7 +1451,7 @@ function parseM3U8(text) {
 
 
         /*
-           ENDLIST
+            ENDLIST
         */
 
         if (
@@ -1359,7 +1469,7 @@ function parseM3U8(text) {
 
 
         /*
-           空行
+            空行
         */
 
         if (!line) {
@@ -1371,7 +1481,7 @@ function parseM3U8(text) {
 
 
         /*
-           当前行必须是 EXTINF
+            当前行不是 EXTINF
         */
 
         if (
@@ -1392,7 +1502,7 @@ function parseM3U8(text) {
 
 
         /*
-           下一行媒体地址
+            下一行媒体地址
         */
 
         const url =
@@ -1409,6 +1519,8 @@ function parseM3U8(text) {
                 "warn"
             );
 
+            failedSegments++;
+
             i += 2;
 
             continue;
@@ -1416,7 +1528,7 @@ function parseM3U8(text) {
 
 
         /*
-           EXTINF
+            EXTINF
         */
 
         let duration =
@@ -1427,19 +1539,39 @@ function parseM3U8(text) {
 
 
         duration =
-            parseFloat(
-                duration
-            );
+            parseFloat(duration);
 
 
         if (
-            Number.isNaN(
-                duration
-            )
+            Number.isNaN(duration)
         ) {
 
             duration = 0;
         }
+
+
+        /*
+            URL 处理
+        */
+
+        let finalURL =
+            url;
+
+
+        /*
+            如果 URL 是相对地址，
+            自动相对于 M3U8
+        */
+
+        try {
+
+            finalURL =
+                new URL(
+                    url,
+                    currentM3U8URL
+                ).href;
+
+        } catch(e) {}
 
 
         segments.push({
@@ -1448,16 +1580,18 @@ function parseM3U8(text) {
                 segments.length + 1,
 
             duration:
+
                 duration,
 
             url:
-                url
+
+                finalURL
 
         });
 
 
         log(
-            `分片 ${segments.length}：${url}`,
+            `分片 ${segments.length}：${finalURL}`,
             "url"
         );
 
@@ -1480,12 +1614,14 @@ function parseM3U8(text) {
 
 
 /* =========================================================
-   CustomTSLoader
-
-   注意：
-
-   这里保持你原来的代码逻辑
+   自定义 Loader
 ========================================================= */
+
+/*
+    这一部分保持你原来的逻辑。
+
+    hls.js 不修改。
+*/
 
 class CustomTSLoader {
 
@@ -1508,6 +1644,7 @@ class CustomTSLoader {
             loaded: 0,
 
             total: 0
+
         };
     }
 
@@ -1537,6 +1674,7 @@ class CustomTSLoader {
             loaded: 0,
 
             total: 0
+
         };
 
 
@@ -1545,8 +1683,7 @@ class CustomTSLoader {
 
 
         const isFragment =
-            context.type ===
-            "fragment";
+            context.type === "fragment";
 
 
         if (isFragment) {
@@ -1559,30 +1696,22 @@ class CustomTSLoader {
 
 
         fetch(
-
             url,
-
             {
 
-                method:
-                    "GET",
+                method: "GET",
 
-                cache:
-                    "no-store",
+                cache: "no-store",
 
                 signal:
                     this.controller.signal
+
             }
-
         )
-
         .then(
-
             response => {
 
-                if (
-                    !response.ok
-                ) {
+                if (!response.ok) {
 
                     throw new Error(
                         `HTTP ${response.status}`
@@ -1612,16 +1741,11 @@ class CustomTSLoader {
 
                 return response.arrayBuffer();
             }
-
         )
-
         .then(
-
             buffer => {
 
-                if (
-                    this.aborted
-                ) {
+                if (this.aborted) {
 
                     return;
                 }
@@ -1639,14 +1763,11 @@ class CustomTSLoader {
 
                     {
 
-                        url:
-                            url,
+                        url: url,
 
-                        data:
-                            buffer,
+                        data: buffer,
 
-                        code:
-                            200
+                        code: 200
 
                     },
 
@@ -1658,16 +1779,11 @@ class CustomTSLoader {
 
                 );
             }
-
         )
-
         .catch(
-
             error => {
 
-                if (
-                    this.aborted
-                ) {
+                if (this.aborted) {
 
                     return;
                 }
@@ -1683,8 +1799,7 @@ class CustomTSLoader {
 
                     {
 
-                        code:
-                            0,
+                        code: 0,
 
                         text:
                             error.message
@@ -1696,6 +1811,7 @@ class CustomTSLoader {
                     null,
 
                     this.stats
+
                 );
             }
         );
@@ -1704,13 +1820,10 @@ class CustomTSLoader {
 
     abort() {
 
-        this.aborted =
-            true;
+        this.aborted = true;
 
 
-        if (
-            this.controller
-        ) {
+        if (this.controller) {
 
             try {
 
@@ -1725,8 +1838,7 @@ class CustomTSLoader {
 
         this.abort();
 
-        this.controller =
-            null;
+        this.controller = null;
     }
 }
 
@@ -1765,7 +1877,7 @@ function createVirtualM3U8() {
 
 
 /* =========================================================
-   Blob M3U8
+   创建 Blob M3U8
 ========================================================= */
 
 function createM3U8Blob() {
@@ -1776,20 +1888,17 @@ function createM3U8Blob() {
 
     const blob =
         new Blob(
-
             [text],
-
             {
 
                 type:
                     "application/vnd.apple.mpegurl"
+
             }
         );
 
 
-    if (
-        currentObjectURL
-    ) {
+    if (currentObjectURL) {
 
         URL.revokeObjectURL(
             currentObjectURL
@@ -1798,9 +1907,7 @@ function createM3U8Blob() {
 
 
     currentObjectURL =
-        URL.createObjectURL(
-            blob
-        );
+        URL.createObjectURL(blob);
 
 
     return currentObjectURL;
@@ -1808,79 +1915,62 @@ function createM3U8Blob() {
 
 
 /* =========================================================
-   阿里云播放器
-
-   使用：
-
-   https://video.aliyuncs.com/player-detection/index.html?source=
-
-   这个页面中的 Source 参数就是原始 M3U8
+   阿里云 H5
 ========================================================= */
 
-function getAliyunURL(source) {
+function getAliyunURL() {
 
     return (
         "https://video.aliyuncs.com/player-detection/index.html?source=" +
-        encodeURIComponent(source)
+        encodeURIComponent(
+            currentM3U8URL
+        )
     );
 }
 
 
 /* =========================================================
-   打开阿里云播放器
+   切换阿里云 H5
 ========================================================= */
 
-function openAliyunPlayer() {
+function startAliyunH5(
+    reason = ""
+) {
 
-    const url =
-        document
-            .getElementById(
-                "m3u8Input"
-            )
-            .value
-            .trim();
-
-
-    if (!url) {
-
-        alert(
-            "请先输入 M3U8 地址"
-        );
+    if (
+        aliyunFallbackStarted
+    ) {
 
         return;
     }
 
 
-    originalM3U8URL =
-        url;
-
-
-    const iframe =
-        document.getElementById(
-            "aliyunPlayer"
-        );
-
-
-    const aliyunURL =
-        getAliyunURL(
-            url
-        );
+    aliyunFallbackStarted = true;
 
 
     log(
-        "正在切换到阿里云原生 H5...",
+        "================================",
+        "dim"
+    );
+
+
+    log(
+        "准备切换阿里云原生 H5",
         "warn"
     );
 
 
-    log(
-        `阿里云 Source：${url}`,
-        "url"
-    );
+    if (reason) {
+
+        log(
+            `切换原因：${reason}`,
+            "warn"
+        );
+    }
 
 
     /*
-       停止本地播放器
+        停止 hls.js
     */
 
     if (hls) {
@@ -1893,6 +1983,13 @@ function openAliyunPlayer() {
 
         hls = null;
     }
+
+
+    /*
+        停止 Chrome MP4
+    */
+
+    stopChromeMP4();
 
 
     const video =
@@ -1915,18 +2012,36 @@ function openAliyunPlayer() {
 
 
     /*
-       显示阿里云页面
+        阿里云 iframe
     */
 
-    iframe.src =
+    const frame =
+        document.getElementById(
+            "aliyunFrame"
+        );
+
+
+    const aliyunURL =
+        getAliyunURL();
+
+
+    log(
+        `阿里云 H5：${aliyunURL}`,
+        "url"
+    );
+
+
+    frame.src =
         aliyunURL;
 
-    iframe.style.display =
-        "block";
+
+    frame.classList.add(
+        "show"
+    );
 
 
-    playerMode =
-        "aliyun";
+    video.style.display =
+        "none";
 
 
     setLoading(
@@ -1935,323 +2050,109 @@ function openAliyunPlayer() {
 
 
     setStatus(
+        "阿里云 H5 播放"
+    );
+
+
+    setMode(
         "阿里云原生 H5"
     );
 
 
     log(
-        "✓ 已切换到阿里云播放器诊断页",
+        "✓ 已切换阿里云 H5",
         "ok"
     );
 }
 
 
 /* =========================================================
-   原生 H5 播放
-
-   这里使用浏览器自己的 <video>
-
-   不使用 hls.js
+   手动阿里云
 ========================================================= */
 
-function startNativeH5(url) {
+function manualAliyun() {
 
-    return new Promise(
-        (resolve, reject) => {
+    const input =
+        document
+            .getElementById(
+                "m3u8Input"
+            )
+            .value
+            .trim();
 
-            const video =
-                document.getElementById(
-                    "video"
-                );
 
+    if (!input) {
 
-            playerMode =
-                "native";
+        alert(
+            "请先输入 M3U8 地址"
+        );
 
+        return;
+    }
 
-            hideAliyunPlayer();
 
+    currentM3U8URL =
+        input;
 
-            log(
-                "① 开始尝试原生 H5 播放",
-                "info"
-            );
 
-
-            /*
-               检查浏览器能力
-            */
-
-            const canPlay =
-                video.canPlayType(
-                    "application/vnd.apple.mpegurl"
-                );
-
-
-            /*
-               部分 Android 浏览器
-               canPlayType 可能为空，
-               但直接设置 src 仍然可以播放。
-
-               所以不直接因为空值失败。
-            */
-
-
-            let settled =
-                false;
-
-
-            function success() {
-
-                if (
-                    settled
-                ) {
-
-                    return;
-                }
-
-
-                settled =
-                    true;
-
-
-                cleanup();
-
-
-                log(
-                    "✓ 原生 H5 已开始播放",
-                    "ok"
-                );
-
-
-                setStatus(
-                    "原生 H5 播放中"
-                );
-
-
-                resolve();
-            }
-
-
-            function failure(reason) {
-
-                if (
-                    settled
-                ) {
-
-                    return;
-                }
-
-
-                settled =
-                    true;
-
-
-                cleanup();
-
-
-                log(
-                    `原生 H5 播放失败：${reason || "未知错误"}`,
-                    "warn"
-                );
-
-
-                reject(
-                    new Error(
-                        reason ||
-                        "原生 H5 播放失败"
-                    )
-                );
-            }
-
-
-            function onPlaying() {
-
-                success();
-            }
-
-
-            function onError() {
-
-                const error =
-                    video.error;
-
-
-                if (
-                    error
-                ) {
-
-                    failure(
-                        `Video错误代码 ${error.code}`
-                    );
-
-                } else {
-
-                    failure(
-                        "Video error"
-                    );
-                }
-            }
-
-
-            function onLoadedMetadata() {
-
-                log(
-                    "原生 H5：loadedmetadata",
-                    "info"
-                );
-            }
-
-
-            function cleanup() {
-
-                video.removeEventListener(
-                    "playing",
-                    onPlaying
-                );
-
-                video.removeEventListener(
-                    "error",
-                    onError
-                );
-
-                video.removeEventListener(
-                    "loadedmetadata",
-                    onLoadedMetadata
-                );
-            }
-
-
-            video.addEventListener(
-                "playing",
-                onPlaying
-            );
-
-
-            video.addEventListener(
-                "error",
-                onError
-            );
-
-
-            video.addEventListener(
-                "loadedmetadata",
-                onLoadedMetadata
-            );
-
-
-            /*
-               设置原始 M3U8
-            */
-
-            video.src =
-                url;
-
-
-            /*
-               开始加载
-            */
-
-            video.load();
-
-
-            /*
-               尝试自动播放
-            */
-
-            const playPromise =
-                video.play();
-
-
-            if (
-                playPromise &&
-                typeof playPromise.catch ===
-                "function"
-            ) {
-
-                playPromise.catch(
-                    error => {
-
-                        /*
-                           NotAllowedError
-                           通常只是浏览器禁止
-                           自动播放。
-
-                           不能把它当成视频播放失败。
-
-                           用户点击播放以后仍可能正常播放。
-                        */
-
-                        if (
-                            error &&
-                            error.name ===
-                            "NotAllowedError"
-                        ) {
-
-                            log(
-                                "原生 H5：浏览器阻止自动播放，请点击播放",
-                                "warn"
-                            );
-
-                            setLoading(
-                                false
-                            );
-
-                            setStatus(
-                                "请点击播放按钮"
-                            );
-
-                            /*
-                               不 reject
-                            */
-
-                            return;
-                        }
-
-
-                        failure(
-                            error
-                                ? error.message
-                                : "play()失败"
-                        );
-                    }
-                );
-            }
-
-
-            /*
-               8秒没有任何播放迹象，
-               自动进入 hls.js
-            */
-
-            fallbackTimer =
-                setTimeout(
-                    () => {
-
-                        if (
-                            !settled
-                        ) {
-
-                            failure(
-                                "原生 H5 8秒未开始播放"
-                            );
-                        }
-
-                    },
-                    8000
-                );
-        }
+    startAliyunH5(
+        "用户手动切换"
     );
 }
 
 
 /* =========================================================
-   启动 hls.js
-
-   下面保持你的原有逻辑
+   Chrome MP4：
+   TS → fMP4 → MediaSource
 ========================================================= */
 
-function startHLS(blobURL) {
+async function startChromeMP4() {
+
+    log(
+        "================================",
+        "dim"
+    );
+
+
+    log(
+        "Chrome MP4 模式启动",
+        "info"
+    );
+
+
+    if (
+        typeof muxjs === "undefined"
+    ) {
+
+        throw new Error(
+            "mux.js 加载失败"
+        );
+    }
+
+
+    if (
+        typeof MediaSource ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "浏览器不支持 MediaSource"
+        );
+    }
+
+
+    if (
+        !segments.length
+    ) {
+
+        throw new Error(
+            "没有可播放分片"
+        );
+    }
+
+
+    stopChromeMP4();
+
 
     const video =
         document.getElementById(
@@ -2259,17 +2160,678 @@ function startHLS(blobURL) {
         );
 
 
-    playerMode =
-        "hls";
+    video.style.display =
+        "block";
 
 
-    hideAliyunPlayer();
+    document.getElementById(
+        "aliyunFrame"
+    ).classList.remove(
+        "show"
+    );
+
+
+    /*
+        创建 MediaSource
+    */
+
+    chromeMediaSource =
+        new MediaSource();
+
+
+    chromeObjectURL =
+        URL.createObjectURL(
+            chromeMediaSource
+        );
+
+
+    video.src =
+        chromeObjectURL;
+
+
+    setMode(
+        "Chrome · TS → fMP4 → MediaSource"
+    );
+
+
+    setLoading(
+        true,
+        "Chrome：准备 MP4..."
+    );
+
+
+    await new Promise(
+        (resolve, reject) => {
+
+            const timer =
+                setTimeout(
+                    () => {
+
+                        reject(
+                            new Error(
+                                "MediaSource 打开超时"
+                            )
+                        );
+
+                    },
+                    10000
+                );
+
+
+            chromeMediaSource.addEventListener(
+                "sourceopen",
+                () => {
+
+                    clearTimeout(
+                        timer
+                    );
+
+                    resolve();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+        }
+    );
+
+
+    /*
+        MPEG-TS → fMP4
+    */
+
+    chromeTransmuxer =
+        new muxjs.mp4.Transmuxer({
+
+            remux: true,
+
+            keepOriginalTimestamps: false
+
+        });
+
+
+    /*
+        暂存输出
+    */
+
+    let firstSegment = true;
+
+
+    chromeTransmuxer.on(
+        "data",
+        segment => {
+
+            try {
+
+                let data;
+
+
+                /*
+                    第一片：
+
+                    initSegment
+                    +
+                    moof/mdat
+                */
+
+                if (
+                    firstSegment &&
+                    segment.initSegment &&
+                    segment.initSegment.byteLength
+                ) {
+
+                    data =
+                        new Uint8Array(
+                            segment
+                                .initSegment
+                                .byteLength +
+                            segment
+                                .data
+                                .byteLength
+                        );
+
+
+                    data.set(
+                        segment.initSegment,
+                        0
+                    );
+
+
+                    data.set(
+                        segment.data,
+                        segment
+                            .initSegment
+                            .byteLength
+                    );
+
+
+                    firstSegment = false;
+
+                    chromeInitAdded =
+                        true;
+
+                } else {
+
+                    data =
+                        new Uint8Array(
+                            segment.data
+                        );
+                }
+
+
+                if (
+                    data.byteLength
+                ) {
+
+                    chromeQueue.push(
+                        data
+                    );
+
+                    appendChromeQueue();
+                }
+
+            } catch(error) {
+
+                log(
+                    "Chrome fMP4 输出失败：" +
+                    error.message,
+                    "error"
+                );
+            }
+        }
+    );
+
+
+    /*
+        尝试自动寻找 MIME
+    */
+
+    const mimeCandidates = [
+
+        'video/mp4; codecs="avc1.64001f,mp4a.40.2"',
+
+        'video/mp4; codecs="avc1.4d401f,mp4a.40.2"',
+
+        'video/mp4; codecs="avc1.42e01e,mp4a.40.2"',
+
+        'video/mp4; codecs="avc1.640028,mp4a.40.2"',
+
+        'video/mp4; codecs="avc1.4d4028,mp4a.40.2"',
+
+        'video/mp4; codecs="avc1.42e01e"',
+
+        'video/mp4; codecs="avc1.4d401f"',
+
+        'video/mp4; codecs="avc1.64001f"',
+
+        'video/mp4'
+    ];
+
+
+    let selectedMime = null;
+
+
+    for (
+        const mime of mimeCandidates
+    ) {
+
+        try {
+
+            if (
+                MediaSource.isTypeSupported(
+                    mime
+                )
+            ) {
+
+                selectedMime =
+                    mime;
+
+                break;
+            }
+
+        } catch(e) {}
+    }
+
+
+    if (!selectedMime) {
+
+        throw new Error(
+            "Chrome 不支持可用的 video/mp4 MIME"
+        );
+    }
+
+
+    log(
+        `Chrome MP4 MIME：${selectedMime}`,
+        "ok"
+    );
+
+
+    try {
+
+        chromeSourceBuffer =
+            chromeMediaSource.addSourceBuffer(
+                selectedMime
+            );
+
+    } catch(error) {
+
+        throw new Error(
+            "创建 MP4 SourceBuffer 失败：" +
+            error.message
+        );
+    }
+
+
+    /*
+        SourceBuffer 完成后继续
+    */
+
+    chromeSourceBuffer.addEventListener(
+        "updateend",
+        () => {
+
+            chromeAppending = false;
+
+            appendChromeQueue();
+
+        }
+    );
+
+
+    chromeSourceBuffer.addEventListener(
+        "error",
+        () => {
+
+            log(
+                "Chrome SourceBuffer 发生错误",
+                "error"
+            );
+
+            if (
+                !chromePlaying
+            ) {
+
+                startAliyunH5(
+                    "Chrome MP4 SourceBuffer 错误"
+                );
+            }
+        }
+    );
+
+
+    /*
+        开始第一个分片
+    */
+
+    await loadChromeSegment(
+        0
+    );
+
+
+    setLoading(
+        false
+    );
+
+
+    /*
+        自动播放
+    */
+
+    try {
+
+        await video.play();
+
+        chromePlaying = true;
+
+        log(
+            "✓ Chrome MP4 自动播放成功",
+            "ok"
+        );
+
+        setStatus(
+            "Chrome MP4 正在播放"
+        );
+
+    } catch(e) {
+
+        log(
+            "Chrome 自动播放被浏览器阻止，请点击播放",
+            "warn"
+        );
+
+        setStatus(
+            "Chrome MP4 · 请点击播放"
+        );
+    }
+}
+
+
+/* =========================================================
+   Chrome SourceBuffer 队列
+========================================================= */
+
+function appendChromeQueue() {
+
+    if (
+        !chromeSourceBuffer ||
+        chromeAppending
+    ) {
+
+        return;
+    }
+
+
+    if (
+        chromeSourceBuffer.updating
+    ) {
+
+        return;
+    }
+
+
+    if (
+        chromeQueue.length === 0
+    ) {
+
+        return;
+    }
+
+
+    const data =
+        chromeQueue.shift();
+
+
+    try {
+
+        chromeAppending =
+            true;
+
+
+        chromeSourceBuffer.appendBuffer(
+            data
+        );
+
+    } catch(error) {
+
+        chromeAppending =
+            false;
+
+
+        log(
+            "Chrome MP4 appendBuffer 失败：" +
+            error.message,
+            "error"
+        );
+
+
+        startAliyunH5(
+            "MP4 appendBuffer 失败"
+        );
+    }
+}
+
+
+/* =========================================================
+   Chrome 加载一个 TS
+========================================================= */
+
+async function loadChromeSegment(
+    index
+) {
+
+    if (
+        index >= segments.length
+    ) {
+
+        log(
+            "✓ Chrome MP4 所有分片已读取",
+            "ok"
+        );
+
+        try {
+
+            if (
+                chromeMediaSource &&
+                chromeMediaSource.readyState ===
+                    "open"
+            ) {
+
+                /*
+                    等队列清空以后结束
+                */
+
+                const finish =
+                    () => {
+
+                        if (
+                            chromeQueue.length === 0 &&
+                            !chromeAppending
+                        ) {
+
+                            try {
+
+                                chromeMediaSource.endOfStream();
+
+                            } catch(e) {}
+
+                            chromeSourceBuffer
+                                ?.removeEventListener(
+                                    "updateend",
+                                    finish
+                                );
+                        }
+                    };
+
+
+                chromeSourceBuffer
+                    ?.addEventListener(
+                        "updateend",
+                        finish
+                    );
+
+
+                finish();
+            }
+
+        } catch(e) {}
+
+        return;
+    }
+
+
+    currentSegment =
+        index + 1;
+
+
+    document.getElementById(
+        "current"
+    ).textContent =
+        currentSegment;
+
+
+    setStatus(
+        `Chrome MP4：读取第 ${currentSegment} 片`
+    );
+
+
+    setLoading(
+        true,
+        `Chrome：读取第 ${currentSegment} 片...`
+    );
+
+
+    const segment =
+        segments[index];
+
+
+    log(
+        `Chrome 请求第 ${currentSegment} 片：${segment.url}`,
+        "url"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                segment.url,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        const buffer =
+            await response.arrayBuffer();
+
+
+        if (
+            !buffer.byteLength
+        ) {
+
+            throw new Error(
+                "分片为空"
+            );
+        }
+
+
+        successfulSegments++;
+
+
+        updateStats();
+
+
+        log(
+            `✓ Chrome 第 ${currentSegment} 片读取成功：${buffer.byteLength} bytes`,
+            "ok"
+        );
+
+
+        /*
+            TS
+            ↓
+            mux.js
+            ↓
+            fMP4
+        */
+
+        chromeTransmuxer.push(
+            new Uint8Array(buffer)
+        );
+
+
+        chromeTransmuxer.flush();
+
+
+        /*
+            给 SourceBuffer 一点时间，
+            然后继续下一片。
+        */
+
+        await waitForChromeQueue();
+
+
+        await loadChromeSegment(
+            index + 1
+        );
+
+    } catch(error) {
+
+        failedSegments++;
+
+        updateStats();
+
+
+        log(
+            `❌ Chrome 第 ${currentSegment} 片失败：${error.message}`,
+            "error"
+        );
+
+
+        throw error;
+    }
+}
+
+
+/* =========================================================
+   等 Chrome MSE 队列
+========================================================= */
+
+function waitForChromeQueue() {
+
+    return new Promise(
+        resolve => {
+
+            let count = 0;
+
+
+            const check =
+                () => {
+
+                    /*
+                        不要无限等待
+                    */
+
+                    if (
+                        count++ > 300
+                    ) {
+
+                        resolve();
+
+                        return;
+                    }
+
+
+                    if (
+                        chromeQueue.length === 0 &&
+                        !chromeAppending
+                    ) {
+
+                        resolve();
+
+                        return;
+                    }
+
+
+                    setTimeout(
+                        check,
+                        20
+                    );
+                };
+
+
+            check();
+        }
+    );
+}
+
+
+/* =========================================================
+   原来的 HLS 初始化
+========================================================= */
+
+function startHLS(blobURL) {
+
+    const video =
+        document.getElementById("video");
 
 
     /*
        浏览器原生 HLS
-
-       这里原来的逻辑保留
+       
+       原逻辑保持
     */
 
     if (
@@ -2284,14 +2846,17 @@ function startHLS(blobURL) {
         );
 
 
+        setMode(
+            "浏览器原生 HLS"
+        );
+
+
         video.src =
             blobURL;
 
 
         video.addEventListener(
-
             "loadedmetadata",
-
             () => {
 
                 setLoading(
@@ -2307,10 +2872,11 @@ function startHLS(blobURL) {
                                 "浏览器阻止自动播放，请点击播放按钮",
                                 "warn"
                             );
+
                         }
                     );
-            },
 
+            },
             {
                 once: true
             }
@@ -2323,6 +2889,8 @@ function startHLS(blobURL) {
 
     /*
        hls.js
+       
+       原逻辑保持
     */
 
     if (
@@ -2352,9 +2920,7 @@ function startHLS(blobURL) {
 
 
     /*
-       自定义 Loader
-
-       保持原来的配置
+       Custom Loader
     */
 
     const config = {
@@ -2392,9 +2958,7 @@ function startHLS(blobURL) {
 
 
     hls =
-        new Hls(
-            config
-        );
+        new Hls(config);
 
 
     /*
@@ -2402,9 +2966,7 @@ function startHLS(blobURL) {
     */
 
     hls.on(
-
         Hls.Events.MEDIA_ATTACHED,
-
         () => {
 
             log(
@@ -2421,9 +2983,7 @@ function startHLS(blobURL) {
 
 
     hls.on(
-
         Hls.Events.MANIFEST_LOADING,
-
         () => {
 
             log(
@@ -2435,9 +2995,7 @@ function startHLS(blobURL) {
 
 
     hls.on(
-
         Hls.Events.MANIFEST_PARSED,
-
         (
             event,
             data
@@ -2459,10 +3017,13 @@ function startHLS(blobURL) {
             );
 
 
+            setMode(
+                "hls.js + CustomTSLoader"
+            );
+
+
             video.play()
-
                 .then(
-
                     () => {
 
                         log(
@@ -2470,11 +3031,8 @@ function startHLS(blobURL) {
                             "ok"
                         );
                     }
-
                 )
-
                 .catch(
-
                     () => {
 
                         log(
@@ -2497,9 +3055,7 @@ function startHLS(blobURL) {
     */
 
     hls.on(
-
         Hls.Events.FRAG_LOADING,
-
         (
             event,
             data
@@ -2527,9 +3083,7 @@ function startHLS(blobURL) {
     */
 
     hls.on(
-
         Hls.Events.FRAG_LOADED,
-
         (
             event,
             data
@@ -2559,18 +3113,14 @@ function startHLS(blobURL) {
     */
 
     hls.on(
-
         Hls.Events.ERROR,
-
         (
             event,
             data
         ) => {
 
             log(
-
                 `HLS：${data.type} / ${data.details}`,
-
                 data.fatal
                     ? "error"
                     : "warn"
@@ -2603,13 +3153,21 @@ function startHLS(blobURL) {
                     } catch(e) {
 
                         log(
-                            "恢复失败：" +
+                            "HLS 网络恢复失败：" +
                             e.message,
                             "error"
                         );
 
 
-                        fallbackToAliyun();
+                        /*
+                            恢复失败
+                            ↓
+                            阿里云
+                        */
+
+                        startAliyunH5(
+                            "hls.js 网络错误恢复失败"
+                        );
                     }
 
 
@@ -2644,7 +3202,9 @@ function startHLS(blobURL) {
                         );
 
 
-                        fallbackToAliyun();
+                        startAliyunH5(
+                            "hls.js 媒体错误恢复失败"
+                        );
                     }
 
 
@@ -2673,10 +3233,19 @@ function startHLS(blobURL) {
 
 
                 /*
-                   最终进入阿里云
+                    自动切换阿里云 H5
                 */
 
-                fallbackToAliyun();
+                setTimeout(
+                    () => {
+
+                        startAliyunH5(
+                            "hls.js 致命错误"
+                        );
+
+                    },
+                    300
+                );
             }
         }
     );
@@ -2693,124 +3262,23 @@ function startHLS(blobURL) {
 
 
 /* =========================================================
-   HLS fallback
-========================================================= */
-
-function fallbackToHLS() {
-
-    if (
-        fallbackStarted
-    ) {
-
-        return;
-    }
-
-
-    fallbackStarted =
-        true;
-
-
-    log(
-        "② 原生 H5 播放失败",
-        "warn"
-    );
-
-
-    log(
-        "③ 切换到 hls.js + CustomTSLoader",
-        "info"
-    );
-
-
-    setLoading(
-        true,
-        "正在切换 hls.js..."
-    );
-
-
-    setStatus(
-        "正在切换 hls.js"
-    );
-
-
-    /*
-       创建虚拟 M3U8
-    */
-
-    const virtualURL =
-        createM3U8Blob();
-
-
-    log(
-        "✓ 已生成虚拟 M3U8",
-        "ok"
-    );
-
-
-    log(
-        "开始边下载边播放",
-        "ok"
-    );
-
-
-    startHLS(
-        virtualURL
-    );
-}
-
-
-/* =========================================================
-   最终 fallback 到阿里云
-========================================================= */
-
-function fallbackToAliyun() {
-
-    if (
-        playerMode ===
-        "aliyun"
-    ) {
-
-        return;
-    }
-
-
-    log(
-        "④ hls.js 无法继续播放",
-        "error"
-    );
-
-
-    log(
-        "⑤ 切换到阿里云原生 H5",
-        "warn"
-    );
-
-
-    setLoading(
-        true,
-        "正在切换阿里云 H5..."
-    );
-
-
-    setTimeout(
-        () => {
-
-            openAliyunPlayer();
-
-        },
-        300
-    );
-}
-
-
-/* =========================================================
    开始播放
 ========================================================= */
 
 async function startPlayer() {
 
-    stopPlayer();
+    /*
+        先停止
+    */
 
+    stopPlayer(
+        true
+    );
+
+
+    /*
+        重置
+    */
 
     segments = [];
 
@@ -2820,7 +3288,7 @@ async function startPlayer() {
 
     currentSegment = 0;
 
-    fallbackStarted = false;
+    aliyunFallbackStarted = false;
 
 
     updateStats();
@@ -2837,6 +3305,10 @@ async function startPlayer() {
     );
 
 
+    /*
+        获取输入
+    */
+
     const url =
         document
             .getElementById(
@@ -2846,31 +3318,23 @@ async function startPlayer() {
             .trim();
 
 
-    /*
-       输入框为空
-    */
-
     if (!url) {
 
-        setLoading(
-            false
-        );
-
+        setLoading(false);
 
         alert(
             "请输入 M3U8 地址"
         );
-
 
         return;
     }
 
 
     /*
-       保存原始地址
+        保存当前 M3U8
     */
 
-    originalM3U8URL =
+    currentM3U8URL =
         url;
 
 
@@ -2895,19 +3359,14 @@ async function startPlayer() {
 
 
         /*
-           =====================================================
-           第一步
+            Chrome 检测
+        */
 
-           读取 M3U8
+        detectChrome();
 
-           这个步骤主要用于：
 
-           1. 验证 M3U8
-           2. 提取 PNG 分片
-           3. 生成虚拟 M3U8
-
-           同时保留原始 M3U8 给阿里云使用
-           =====================================================
+        /*
+            读取原始 M3U8
         */
 
         const text =
@@ -2917,7 +3376,7 @@ async function startPlayer() {
 
 
         /*
-           解析
+            解析
         */
 
         parseM3U8(
@@ -2942,64 +3401,86 @@ async function startPlayer() {
 
 
         /*
-           =====================================================
-           第二步
+            Chrome：
 
-           优先尝试浏览器原生 H5
-
-           注意：
-
-           这里使用的是原始 M3U8，
-           不使用虚拟 M3U8。
-           =====================================================
+            TS → fMP4
         */
 
-        try {
+        if (
+            chromeMP4Mode
+        ) {
 
-            await startNativeH5(
-                url
-            );
+            try {
+
+                await startChromeMP4();
+
+                return;
+
+            } catch(error) {
+
+                log(
+                    "❌ Chrome MP4 播放失败：" +
+                    error.message,
+                    "error"
+                );
 
 
-            /*
-               如果真正触发 playing，
-               就不会继续进入 hls.js。
-            */
+                /*
+                    Chrome MP4 失败
+                    ↓
+                    阿里云
+                */
 
-            setLoading(
-                false
-            );
+                startAliyunH5(
+                    "Chrome TS → fMP4 播放失败"
+                );
 
 
-            return;
-
-        } catch(nativeError) {
-
-            log(
-                `原生 H5 失败：${nativeError.message}`,
-                "warn"
-            );
+                return;
+            }
         }
 
 
         /*
-           =====================================================
-           第三步
+            其他浏览器：
 
-           原生 H5 失败
-
-           使用你原来的 hls.js
-           =====================================================
+            原来的虚拟 M3U8
         */
 
-        fallbackToHLS();
+        const virtualURL =
+            createM3U8Blob();
+
+
+        log(
+            "✓ 已生成虚拟 M3U8",
+            "ok"
+        );
+
+
+        log(
+            "开始边下载边播放",
+            "ok"
+        );
+
+
+        setLoading(
+            true,
+            "正在加载 M3U8..."
+        );
+
+
+        /*
+            原 hls.js
+        */
+
+        startHLS(
+            virtualURL
+        );
 
 
     } catch(error) {
 
-        console.error(
-            error
-        );
+        console.error(error);
 
 
         log(
@@ -3019,23 +3500,12 @@ async function startPlayer() {
 
 
         /*
-           如果 M3U8 解析本身失败，
-           直接交给阿里云诊断工具
+            启动阶段失败
+            → 阿里云
         */
 
-        log(
-            "尝试使用阿里云原生 H5 诊断...",
-            "warn"
-        );
-
-
-        setTimeout(
-            () => {
-
-                openAliyunPlayer();
-
-            },
-            300
+        startAliyunH5(
+            "播放器启动失败"
         );
     }
 }
@@ -3051,14 +3521,8 @@ const video =
     );
 
 
-/*
-   播放开始
-*/
-
 video.addEventListener(
-
     "playing",
-
     () => {
 
         setLoading(
@@ -3067,9 +3531,7 @@ video.addEventListener(
 
 
         setStatus(
-            playerMode === "hls"
-                ? "hls.js 正在播放"
-                : "原生 H5 正在播放"
+            "正在播放"
         );
 
 
@@ -3081,15 +3543,22 @@ video.addEventListener(
 );
 
 
-/*
-   等待数据
-*/
-
 video.addEventListener(
-
     "waiting",
-
     () => {
+
+        /*
+            如果已经切到阿里云，
+            不处理
+        */
+
+        if (
+            aliyunFallbackStarted
+        ) {
+
+            return;
+        }
+
 
         setLoading(
             true,
@@ -3104,15 +3573,17 @@ video.addEventListener(
 );
 
 
-/*
-   可以播放
-*/
-
 video.addEventListener(
-
     "canplay",
-
     () => {
+
+        if (
+            aliyunFallbackStarted
+        ) {
+
+            return;
+        }
+
 
         setLoading(
             false
@@ -3120,22 +3591,14 @@ video.addEventListener(
 
 
         setStatus(
-            playerMode === "hls"
-                ? "hls.js 可以播放"
-                : "原生 H5 可以播放"
+            "可以播放"
         );
     }
 );
 
 
-/*
-   播放结束
-*/
-
 video.addEventListener(
-
     "ended",
-
     () => {
 
         setLoading(
@@ -3156,72 +3619,44 @@ video.addEventListener(
 );
 
 
-/*
-   Video error
-
-   这里特别处理：
-
-   如果是原生 H5 出错，
-   自动进入 hls.js。
-
-   如果 hls.js 的 video 出错，
-   再进入阿里云。
-*/
-
 video.addEventListener(
-
     "error",
-
     () => {
 
-        const error =
-            video.error;
-
-
         if (
-            error
+            aliyunFallbackStarted
         ) {
-
-            log(
-                `Video 错误：${error.code}`,
-                "error"
-            );
-        }
-
-
-        /*
-           原生 H5 阶段
-        */
-
-        if (
-            playerMode ===
-            "native"
-        ) {
-
-            fallbackToHLS();
 
             return;
         }
 
 
-        /*
-           hls.js 阶段
+        const error =
+            video.error;
 
-           不立即因为一次 Video error
-           就切换。
 
-           hls.js 自己的 ERROR 事件
-           会负责判断是否 fatal。
-        */
-
-        if (
-            playerMode ===
-            "hls"
-        ) {
+        if (error) {
 
             log(
-                "Video 层出现错误，等待 hls.js 判断...",
-                "warn"
+                `Video 错误：${error.code}`,
+                "error"
+            );
+
+
+            /*
+                Video 错误
+                → 阿里云
+            */
+
+            setTimeout(
+                () => {
+
+                    startAliyunH5(
+                        `Video 错误 ${error.code}`
+                    );
+
+                },
+                300
             );
         }
     }
@@ -3239,16 +3674,21 @@ log(
 
 
 log(
-    "工作模式：原生 H5 → hls.js → 阿里云原生 H5",
+    "工作模式：过滤前5行 → EXTINF/URL → 虚拟M3U8 → Custom Loader → hls.js",
     "info"
 );
 
 
 log(
-    "M3U8 解析：过滤前5行 → EXTINF/URL → ENDLIST",
+    "Chrome：额外支持 TS → fMP4 → MediaSource",
     "info"
 );
 
+
+log(
+    "播放失败：自动切换阿里云原生 H5",
+    "info"
+);
 
 </script>
 
